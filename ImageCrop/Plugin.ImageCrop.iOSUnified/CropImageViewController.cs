@@ -20,10 +20,12 @@ namespace Plugin.ImageCrop
 
         nfloat resizerSize = 40;
         UIColor cropperColor = UIColor.Red;
-        int cropperSize = 200;
+        
         nfloat previewImageSize = 100;
+        int cropperStartSize = 200;
         int cropperMinSize = 60;
         double maxResizeFactor = 1;
+        double cropperAspectRatio = 1;
         nfloat cropperTransparency = 0.6f;
         nfloat cropperLineWidth = 5;
         nfloat marginY = 60;
@@ -31,17 +33,18 @@ namespace Plugin.ImageCrop
         
         public event EventHandler OnSaved;
 
-        string picturePath;
-        int maxReturnImageWidth;
-        int maxReturnImageHeight;
+        string _picturePath;
+        int _croppedImageWidth;
+        int _croppedImageHeight;
 
-        public CropImageViewController(string path, int maxReturnImageSize)
+        public CropImageViewController(string path, int croppedImageWidth = 0, int croppedImageHeight = 0)
         {
-            picturePath = path;
-            maxReturnImageWidth = maxReturnImageSize;
-            maxReturnImageHeight = maxReturnImageSize;
+            _picturePath = path;
+            _croppedImageWidth = croppedImageWidth;
+            _croppedImageHeight = croppedImageHeight;
 
-            //this.View.MultipleTouchEnabled = true;
+            if (_croppedImageWidth != 0 && _croppedImageHeight != 0)
+                SetCropperAspectRatio((double)_croppedImageWidth, (double)_croppedImageHeight);
         }
 
         public override void ViewDidLoad()
@@ -50,12 +53,12 @@ namespace Plugin.ImageCrop
 
             View.BackgroundColor = UIColor.White;
 
-            pic = new UIImage(picturePath);
+            pic = new UIImage(_picturePath);
             var maxScaledPictureSize = UIScreen.MainScreen.Bounds.Size;
             maxScaledPictureSize.Width -= marginX;
             maxScaledPictureSize.Height -= (marginY + 100);
 
-            var scaledPicture = MaxResizeImage(pic, (float)maxScaledPictureSize.Width, (float)maxScaledPictureSize.Height);
+            var scaledPicture = ResizeImage(pic, (float)maxScaledPictureSize.Width, (float)maxScaledPictureSize.Height);
             picture = new UIImageView(scaledPicture);             
             picture.Frame = new CGRect(marginX, marginY, (int)scaledPicture.Size.Width, (int)scaledPicture.Size.Height);
 
@@ -63,9 +66,9 @@ namespace Plugin.ImageCrop
 
             SetCropper();
 
-            previewImage = new UIImageView(new CGRect(10, PictureY - previewImageSize / 2, previewImageSize, previewImageSize)); //AddImage((int)cropSizeF.Height, (int)cropSizeF.Width);
-            AddShadow(ref previewImage);
-            Add(previewImage);
+            //previewImage = new UIImageView(new CGRect(10, PictureY - previewImageSize / 2, previewImageSize, previewImageSize));
+            //AddShadow(ref previewImage);
+            //Add(previewImage);
 
             resizer = new CropperResizerView(cropperColor, cropperTransparency, cropperLineWidth);
             Add(resizer);
@@ -88,14 +91,14 @@ namespace Plugin.ImageCrop
         {
             var resizedImage = previewImage.Image;
             
-            if(maxReturnImageHeight > 0 || maxReturnImageWidth > 0)
-                resizedImage = MaxResizeImage(previewImage.Image, (float)maxReturnImageWidth, (float)maxReturnImageHeight);
+            if(_croppedImageHeight > 0 || _croppedImageWidth > 0)
+                resizedImage = ResizeImage(previewImage.Image, (float)_croppedImageWidth, (float)_croppedImageHeight);
             
             NSData imgData = resizedImage.AsJPEG();
             NSError err = null;
-            if (imgData.Save(picturePath, false, out err))
+            if (imgData.Save(_picturePath, false, out err))
             {
-                Console.WriteLine("saved as " + picturePath);
+                Console.WriteLine("saved as " + _picturePath);
                 
                 DismissViewController(true, null);
                 var obj = new NSDictionary();
@@ -105,19 +108,42 @@ namespace Plugin.ImageCrop
             }
             else
             {
-                Console.WriteLine("NOT saved as " + picturePath + " because" + err.LocalizedDescription);
+                Console.WriteLine("NOT saved as " + _picturePath + " because" + err.LocalizedDescription);
             }
         }
 
         private void SetPreviewImage()
         {
+            if (previewImage == null)
+            {
+                previewImage = new UIImageView(new CGRect(10, PictureY - previewImageSize / 2, previewImageSize, previewImageSize / cropperAspectRatio));
+                AddShadow(ref previewImage);
+                Add(previewImage);
+            }
+
+            // set preview image size
+            var width = previewImageSize;
+            var height = width / cropperAspectRatio;
+
+            // restrict preview image size
+            if(height > previewImageSize)
+            {
+                height = previewImageSize;
+                width = previewImageSize * (nfloat)cropperAspectRatio;
+            }
+
+            previewImage.Frame = new CGRect(10, PictureY + 60 - height, width, height);
+
             previewImage.Image = CropImage(pic,
-                (float)(cropper.Frame.X / maxResizeFactor - marginX / maxResizeFactor), 
+                (float)(cropper.Frame.X / maxResizeFactor - marginX / maxResizeFactor),
                 (float)(cropper.Frame.Y / maxResizeFactor - marginY / maxResizeFactor), 
-                (float)(cropper.Frame.Width / maxResizeFactor), 
+                (float)(cropper.Frame.Width / maxResizeFactor),
                 (float)(cropper.Frame.Height / maxResizeFactor));           
         }
 
+        /// <summary>
+        /// The resizer triangle to resize the cropper.
+        /// </summary>
         private void SetResizer()
         {
             resizer.Frame = new CGRect(
@@ -129,15 +155,19 @@ namespace Plugin.ImageCrop
 
         private void SetCropper()
         {
-            PointF startPoint = new PointF((float)(PictureX / 2 - cropperSize / 2), (float)(PictureY / 2 - cropperSize / 2));
-            SizeF size = new SizeF(cropperSize, cropperSize);
+            PointF centerCropperLocation = new PointF(
+                (float)(PictureX / 2 - cropperStartSize / 2), 
+                (float)((PictureY / 2 - cropperStartSize / 2)));
 
-            cropper = new CropperView(startPoint, size, cropperColor, cropperTransparency, cropperLineWidth);
+            var restrictedSize = RestrictCropperSize((nfloat)cropperStartSize, (nfloat)(cropperStartSize / cropperAspectRatio), centerCropperLocation.X, centerCropperLocation.Y);
+            SizeF size = new SizeF((float)restrictedSize.Width, (float)restrictedSize.Height);
+
+            cropper = new CropperView(centerCropperLocation, size, cropperColor, cropperTransparency, cropperLineWidth);
             
             // enable Pinch
             cropper.MultipleTouchEnabled = true;
-            var pinchRecognizer = new UIPinchGestureRecognizer(handlePinchGesture);
-            handlePinchGesture(pinchRecognizer);
+            var pinchRecognizer = new UIPinchGestureRecognizer(HandlePinchGesture);
+            HandlePinchGesture(pinchRecognizer);
             cropper.AddGestureRecognizer(pinchRecognizer);
 
             Add(cropper);
@@ -147,7 +177,7 @@ namespace Plugin.ImageCrop
         nfloat cropperHeight;
         nfloat cropperX;
         nfloat cropperY;
-        public void handlePinchGesture(UIPinchGestureRecognizer sender)
+        public void HandlePinchGesture(UIPinchGestureRecognizer sender)
         {
             resizeCropper = false;
             dragCropper = false;
@@ -163,7 +193,7 @@ namespace Plugin.ImageCrop
                 case UIGestureRecognizerState.Changed:
                     //cropper.Frame = new CGRect(cropperX - ((cropperWidth * scale - cropperWidth) / 2), cropperY - ((cropperHeight * scale - cropperHeight) / 2), cropperWidth * scale, cropperHeight * scale);
                     var point = RestrictCropperPosition(cropperX - ((cropperWidth * scale - cropperWidth) / 2), cropperY - ((cropperHeight * scale - cropperHeight) / 2));
-                    var size = RestrictCropperSize(cropperWidth * scale, cropperHeight * scale);
+                    var size = RestrictCropperSize(cropperWidth * scale, cropperHeight * scale, cropper.Frame.X, cropper.Frame.Y);
                     cropper.Frame = new CGRect(point, size);
                     cropper.SetNeedsDisplay();
                     SetResizer();
@@ -186,8 +216,14 @@ namespace Plugin.ImageCrop
             view.BackgroundColor = UIColor.White;
         }
 
-        // resize the image to be contained within a maximum width and height, keeping aspect ratio
-        public UIImage MaxResizeImage(UIImage sourceImage, float maxWidth, float maxHeight)
+        /// <summary>
+        /// Resize the image to be contained within a maximum width and height, keeping aspect ratio
+        /// </summary>
+        /// <param name="sourceImage"></param>
+        /// <param name="maxWidth"></param>
+        /// <param name="maxHeight"></param>
+        /// <returns></returns>
+        public UIImage ResizeImage(UIImage sourceImage, float maxWidth, float maxHeight)
         {
             var sourceSize = sourceImage.Size;
             maxResizeFactor = Math.Min(maxWidth / sourceSize.Width, maxHeight / sourceSize.Height);
@@ -266,8 +302,8 @@ namespace Plugin.ImageCrop
                 // move the cropperRectangle                
                 nfloat x = cropper.Frame.X - offsetX;
                 nfloat y = cropper.Frame.Y - offsetY;
-                
-                cropper.Frame = new CGRect(RestrictCropperPosition(x, y), RestrictCropperSize(cropper.Frame.Size.Width, cropper.Frame.Size.Height));
+
+                cropper.Frame = GetCropperRect(cropper.Frame.Size.Width, cropper.Frame.Size.Height, x, y);
                 cropper.SetNeedsDisplay();
 
                 //SetPreviewImage();
@@ -275,14 +311,16 @@ namespace Plugin.ImageCrop
             }
             else if (resizeCropper)
             {
-                var offset = (offsetX + offsetY) / 2;
+                nfloat width = cropper.Frame.Size.Width - offsetX;
+                nfloat height = cropper.Frame.Size.Height - offsetY;
+                if (_croppedImageHeight != 0 && _croppedImageWidth != 0)
+                {
+                    var offset = (offsetX + offsetY) / 2;
 
-                nfloat width = cropper.Frame.Size.Width - offset;
-                nfloat height = cropper.Frame.Size.Height - offset;
-                
-                cropper.Frame = new CGRect(
-                    RestrictCropperPosition(cropper.Frame.X, cropper.Frame.Y), 
-                    RestrictCropperSize(width, height));
+                    width = cropper.Frame.Size.Width - offset;
+                    height = width / (nfloat)cropperAspectRatio;
+                }
+                cropper.Frame = GetCropperRect(width, height, cropper.Frame.X, cropper.Frame.Y);
 
                 // make sure to redraw the cropper, otherwise the outline will get narrower and thicker when resizing
                 cropper.SetNeedsDisplay();
@@ -290,6 +328,23 @@ namespace Plugin.ImageCrop
                 //SetPreviewImage();
                 SetResizer();
             }
+        }
+
+        private CGRect GetCropperRect(nfloat width, nfloat height, nfloat x, nfloat y)
+        {
+            var position = RestrictCropperPosition(x, y);
+            var size = RestrictCropperSize(width, height, position.X, position.Y);
+
+            SetCropperAspectRatio(size.Width, size.Height);            
+            return new CGRect(position, size);
+        }
+
+        private void SetCropperAspectRatio(double width, double height)
+        {
+            if (_croppedImageWidth == 0 || _croppedImageHeight == 0)
+                cropperAspectRatio = 1;
+
+            cropperAspectRatio = width / height;
         }
 
         private CGPoint RestrictCropperPosition(nfloat x, nfloat y)
@@ -305,22 +360,34 @@ namespace Plugin.ImageCrop
             return new CGPoint(x, y);
         }
 
-        private CGSize RestrictCropperSize(nfloat width, nfloat height)
-        {
-            // restrict to cropper to stay within picture when resizing: prevent resizing bigger than picture
-            if (width + cropper.Frame.X > PictureX || height + cropper.Frame.Y > PictureY)
+        private CGSize RestrictCropperSize(nfloat width, nfloat height, nfloat x, nfloat y)
+        {            
+            // restrict cropper size to stay within picture when resizing: prevent resizing bigger than picture
+            if (width + x > PictureX)
             {
-                width -= (width + cropper.Frame.X - PictureX);
-                height = width; //(size.Width + cropper.Frame.X - PictureX);
+                width -= (width + x - PictureX);
+                height = width / (nfloat)cropperAspectRatio;
+            }
+
+            if (height + y > PictureY)
+            {
+                height -= (height + y - PictureY);
+                width = height * (nfloat)cropperAspectRatio;
             }
 
             // restrict to minimum width
             if (width < cropperMinSize)
+            {
                 width = (nfloat)cropperMinSize;
+                height = width / (nfloat)cropperAspectRatio;
+            }
 
             // restrict to minimum height
             if (height < cropperMinSize)
+            {
                 height = (nfloat)cropperMinSize;
+                width = height * (nfloat)cropperAspectRatio;
+            }
 
             return new CGSize(width, height);
         }

@@ -62,6 +62,7 @@ namespace ImageCropTest.iOS
                 Console.WriteLine("saved as " + picturePath);
                 //CrossImageCrop.Current.MaxReturnImageHeight = 300;
                 //CrossImageCrop.Current.MaxReturnImageWidth = 300;
+                //CrossImageCrop.Current.CropImage(picturePath, () => SetPicture(), 200, 300);
                 CrossImageCrop.Current.CropImage(picturePath, () => SetPicture());
             }
             else
@@ -76,7 +77,12 @@ namespace ImageCropTest.iOS
                 return;
 
             _picture.Image = new UIImage(picturePath);
-            _picture.Frame = new CGRect(_picture.Frame.X, _picture.Frame.Y, defaultSize, defaultSize);
+
+            var factorW = defaultSize / _picture.Image.Size.Width;
+            var factorH = defaultSize / _picture.Image.Size.Height;
+            var factor = Math.Min(factorW, factorH);
+            
+            _picture.Frame = new CGRect(_picture.Frame.X, _picture.Frame.Y, _picture.Image.Size.Width * factor, _picture.Image.Size.Height * factor);
         }
                 
         public override void DidReceiveMemoryWarning()

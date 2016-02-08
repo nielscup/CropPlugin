@@ -13,12 +13,12 @@ namespace Plugin.ImageCrop
     public class ImageCropImplementation : IImageCrop
     {
         Action _callback;
-        
-        public async Task CropImage(string imagePath, Action callback, int maxCroppedImageSize = 300)
+
+        public async Task CropImage(string imagePath, Action callback, int croppedImageWidth = 0, int croppedImageHeight = 0)        
         {
             try
             {
-                var _cropImageViewController = new CropImageViewController(imagePath, maxCroppedImageSize);
+                var _cropImageViewController = new CropImageViewController(imagePath, croppedImageWidth, croppedImageHeight);
                 _cropImageViewController.OnSaved += cropImageViewController_OnSaved;
                 _callback = callback;
 
@@ -38,13 +38,13 @@ namespace Plugin.ImageCrop
                 Console.WriteLine("Unable to share text" + ex.Message);
             }
         }
-
+        
         void cropImageViewController_OnSaved(object sender, EventArgs e)
         {
             var cb = _callback;
             _callback = null;
 
             cb();
-        }
+        }                
     }
 }
