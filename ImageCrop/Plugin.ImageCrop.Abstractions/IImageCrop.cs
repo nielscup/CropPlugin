@@ -13,9 +13,17 @@ namespace Plugin.ImageCrop.Abstractions
         /// </summary>
         /// <param name="imagePath"></param>
         /// <param name="callback"></param>
-        /// <param name="optional: the width of the image after cropping"></param>
-        /// <param name="optional: the height of the image after cropping"></param>
+        /// <param name="The width of the image after cropping"></param>
+        /// <param name="The height of the image after cropping"></param>
         /// <returns></returns>
-        Task CropImage(string imagePath, Action callback, int croppedImageWidth = 0, int croppedImageHeight = 0);
+        Task CropImage(string imagePath, Action callback, int croppedImageWidth, int croppedImageHeight);
+
+        /// <summary>
+        /// Crop Image
+        /// </summary>
+        /// <param name="imagePath"></param>
+        /// <param name="callback"></param>
+        /// <returns></returns>
+        Task CropImage(string imagePath, Action callback);
     }
 }

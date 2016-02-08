@@ -14,22 +14,19 @@ namespace Plugin.ImageCrop
     {
         Action _callback;
 
-        public async Task CropImage(string imagePath, Action callback, int croppedImageWidth = 0, int croppedImageHeight = 0)        
+        public async Task CropImage(string imagePath, Action callback)
+        {
+            await CropImage(imagePath, callback, 0, 0);
+        }
+
+        public async Task CropImage(string imagePath, Action callback, int croppedImageWidth, int croppedImageHeight)        
         {
             try
             {
                 var _cropImageViewController = new CropImageViewController(imagePath, croppedImageWidth, croppedImageHeight);
                 _cropImageViewController.OnSaved += cropImageViewController_OnSaved;
                 _callback = callback;
-
-                //if (activityController.PopoverPresentationController != null)
-                //{
-                //    activityController.PopoverPresentationController.SourceView =
-                //      UIApplication.SharedApplication.KeyWindow.RootViewController.ChildViewControllers != null
-                //        ? UIApplication.SharedApplication.KeyWindow.RootViewController.ChildViewControllers[0].View
-                //        : UIApplication.SharedApplication.KeyWindow.RootViewController.View;
-                //}
-
+                
                 var vc = UIApplication.SharedApplication.KeyWindow.RootViewController;
                 await vc.PresentViewControllerAsync(_cropImageViewController, true);
             }

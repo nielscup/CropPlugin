@@ -47,7 +47,6 @@ namespace ImageCropTest.iOS
         async void shareButton_TouchUpInside(object sender, EventArgs e)
         {
             await CrossShare.Current.ShareLocalFile(picturePath);
-            //CameraHelper.SelectPicture(this, (obj) => SaveAndCropImage(obj));
         }
 
         private void SaveAndCropImage(NSDictionary obj)
@@ -60,8 +59,8 @@ namespace ImageCropTest.iOS
             if (imgData.Save(picturePath, false, out err))
             {
                 Console.WriteLine("saved as " + picturePath);
-                //CrossImageCrop.Current.CropImage(picturePath, () => SetPicture());
-                CrossImageCrop.Current.CropImage(picturePath, () => SetPicture(), 300, 300);
+                CrossImageCrop.Current.CropImage(picturePath, () => SetPicture());
+                //CrossImageCrop.Current.CropImage(picturePath, () => SetPicture(), 300, 300);
             }
             else
             {
