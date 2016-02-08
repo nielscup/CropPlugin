@@ -50,25 +50,20 @@ namespace Plugin.ImageCrop
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-
-            View.BackgroundColor = UIColor.White;
-
+            
             pic = new UIImage(_picturePath);
             var maxScaledPictureSize = UIScreen.MainScreen.Bounds.Size;
             maxScaledPictureSize.Width -= marginX;
             maxScaledPictureSize.Height -= (marginY + 100);
 
             var scaledPicture = ResizeImage(pic, (float)maxScaledPictureSize.Width, (float)maxScaledPictureSize.Height);
-            picture = new UIImageView(scaledPicture);             
+            picture = new UIImageView(scaledPicture);
+            //marginY = (UIScreen.MainScreen.Bounds.Size.Height - picture.Frame.Height + 10) / 2;
             picture.Frame = new CGRect(marginX, marginY, (int)scaledPicture.Size.Width, (int)scaledPicture.Size.Height);
 
             Add(picture);
 
             SetCropper();
-
-            //previewImage = new UIImageView(new CGRect(10, PictureY - previewImageSize / 2, previewImageSize, previewImageSize));
-            //AddShadow(ref previewImage);
-            //Add(previewImage);
 
             resizer = new CropperResizerView(cropperColor, cropperTransparency, cropperLineWidth);
             Add(resizer);
@@ -76,18 +71,39 @@ namespace Plugin.ImageCrop
             SetPreviewImage();
             SetResizer();
 
-            var saveButton = new UIButton(new CGRect(PictureX - 210, PictureY + 10, 200f, 40f)); //AddImage((int)cropSizeF.Height, (int)cropSizeF.Width);
-            saveButton.SetTitle("Save", UIControlState.Normal);
-            saveButton.SetTitleColor(new UIColor(1, 0, 0, 1), UIControlState.Normal);
-            saveButton.TouchUpInside += (s, e) =>
-            {
-                Save();
-            };
+            var cancelButton = AddButton("Cancel", 150f, 20f, UIControlContentHorizontalAlignment.Left);
+            cancelButton.TouchUpInside += cancelButton_TouchUpInside;
 
-            Add(saveButton);
+            var saveButton = AddButton("Save", 150f, 20f, UIControlContentHorizontalAlignment.Right);
+            saveButton.TouchUpInside += saveButton_TouchUpInside;                        
+        }
+
+        private UIButton AddButton(string title, nfloat width, nfloat margin, UIControlContentHorizontalAlignment contentHorizontalAlignment)
+        {
+            var x = margin;
+            if (contentHorizontalAlignment == UIControlContentHorizontalAlignment.Right)
+                x = PictureX - (width + margin);
+
+            var button = new UIButton(new CGRect(x, UIScreen.MainScreen.Bounds.Size.Height - 60, width, 40f));
+            button.SetTitle(title, UIControlState.Normal);
+            button.SetTitleColor(UIColor.White, UIControlState.Normal);
+            button.HorizontalAlignment = contentHorizontalAlignment;            
+            Add(button);
+
+            return button;
+        }
+
+        void cancelButton_TouchUpInside(object sender, EventArgs e)
+        {
+            DismissViewController(true, null);
+        }
+
+        public override bool PrefersStatusBarHidden()
+        {
+            return true;
         }
                     
-        public void Save()
+        void saveButton_TouchUpInside(object sender, EventArgs e)
         {
             var resizedImage = previewImage.Image;
             
@@ -132,7 +148,7 @@ namespace Plugin.ImageCrop
                 width = previewImageSize * (nfloat)cropperAspectRatio;
             }
 
-            previewImage.Frame = new CGRect(10, PictureY + 60 - height, width, height);
+            previewImage.Frame = new CGRect(10, 10 + PictureY - height, width, height);
 
             previewImage.Image = CropImage(pic,
                 (float)(cropper.Frame.X / maxResizeFactor - marginX / maxResizeFactor),
@@ -191,7 +207,6 @@ namespace Plugin.ImageCrop
                     cropperY = cropper.Frame.Y;
                     break;
                 case UIGestureRecognizerState.Changed:
-                    //cropper.Frame = new CGRect(cropperX - ((cropperWidth * scale - cropperWidth) / 2), cropperY - ((cropperHeight * scale - cropperHeight) / 2), cropperWidth * scale, cropperHeight * scale);
                     var point = RestrictCropperPosition(cropperX - ((cropperWidth * scale - cropperWidth) / 2), cropperY - ((cropperHeight * scale - cropperHeight) / 2));
                     var size = RestrictCropperSize(cropperWidth * scale, cropperHeight * scale, cropper.Frame.X, cropper.Frame.Y);
                     cropper.Frame = new CGRect(point, size);
@@ -201,7 +216,6 @@ namespace Plugin.ImageCrop
                     break;
                 case UIGestureRecognizerState.Ended:
                     SetPreviewImage();
-                //pinchLayout.setPinchedCellScale((float)sender.Scale);
                     break;
             }
         }

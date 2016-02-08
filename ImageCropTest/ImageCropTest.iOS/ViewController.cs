@@ -60,9 +60,6 @@ namespace ImageCropTest.iOS
             if (imgData.Save(picturePath, false, out err))
             {
                 Console.WriteLine("saved as " + picturePath);
-                //CrossImageCrop.Current.MaxReturnImageHeight = 300;
-                //CrossImageCrop.Current.MaxReturnImageWidth = 300;
-                //CrossImageCrop.Current.CropImage(picturePath, () => SetPicture(), 200, 300);
                 CrossImageCrop.Current.CropImage(picturePath, () => SetPicture());
             }
             else
