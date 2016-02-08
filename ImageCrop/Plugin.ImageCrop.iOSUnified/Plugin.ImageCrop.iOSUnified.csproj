@@ -40,6 +40,7 @@
     </Compile>
     <Compile Include="CropImageViewController.cs" />
     <Compile Include="CropperResizerView.cs" />
+    <Compile Include="CropperOverlayView.cs" />
     <Compile Include="CropperView.cs" />
     <Compile Include="ImageCropImplementation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

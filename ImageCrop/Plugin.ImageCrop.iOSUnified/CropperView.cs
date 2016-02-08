@@ -23,37 +23,12 @@ namespace Plugin.ImageCrop
             _color = color ?? UIColor.Red;
             _transparancy = transparancy == 0 ? 0.8f : transparancy;
             _lineWidth = lineWidth == 0 ? 3f : lineWidth;
-
-            //this.MultipleTouchEnabled = true;
-
+            
             RectangleF frameRect = new RectangleF(_targetLocation.X, _targetLocation.Y, _size.Width, _size.Height);
             this.Frame = frameRect;
             this.BackgroundColor = UIColor.Clear;
-
-            //var pinchRecognizer = new UIPinchGestureRecognizer(handlePinchGesture);
-            //handlePinchGesture(pinchRecognizer);
-
-            //this.AddGestureRecognizer(pinchRecognizer);
         }
 
-        //nfloat width;
-        //nfloat height;
-
-        //public void handlePinchGesture(UIPinchGestureRecognizer sender)
-        //{            
-        //    switch (sender.State)
-        //    {
-        //        case UIGestureRecognizerState.Began:
-        //            width = this.Frame.Width;
-        //            height = this.Frame.Height;
-        //            break;
-        //        case UIGestureRecognizerState.Changed:
-        //            this.Frame = new CGRect(this.Frame.X, this.Frame.Y, width * sender.Scale, height * sender.Scale);
-        //            //pinchLayout.setPinchedCellScale((float)sender.Scale);
-        //            break;                
-        //    }
-        //}
-                
         public override void Draw(CGRect rect)
         {
             //get graphics context
@@ -73,7 +48,7 @@ namespace Plugin.ImageCrop
 
                 //add geometry to graphics context and draw it
                 g.AddPath(_path);
-                g.DrawPath(CGPathDrawingMode.FillStroke);
+                g.DrawPath(CGPathDrawingMode.FillStroke);                
             }
         }
     }

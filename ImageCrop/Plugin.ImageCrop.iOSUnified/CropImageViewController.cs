@@ -13,6 +13,7 @@ namespace Plugin.ImageCrop
         UIImageView picture;
         UIImageView previewImage;
         CropperView cropper;
+        CropperOverlayView overlay;
         bool dragCropper = false;
         bool resizeCropper = false;
         UIImage pic;
@@ -63,13 +64,15 @@ namespace Plugin.ImageCrop
 
             Add(picture);
 
-            SetCropper();
+            //SetCropper();
 
             resizer = new CropperResizerView(cropperColor, cropperTransparency, cropperLineWidth);
             Add(resizer);
-
-            SetPreviewImage();
-            SetResizer();
+                                    
+            //SetOverLay();
+            SetCropper();
+            //SetResizer();
+            //SetPreviewImage();
 
             var cancelButton = AddButton("Cancel", 150f, 20f, UIControlContentHorizontalAlignment.Left);
             cancelButton.TouchUpInside += cancelButton_TouchUpInside;
@@ -179,14 +182,32 @@ namespace Plugin.ImageCrop
             SizeF size = new SizeF((float)restrictedSize.Width, (float)restrictedSize.Height);
 
             cropper = new CropperView(centerCropperLocation, size, cropperColor, cropperTransparency, cropperLineWidth);
-            
+                        
             // enable Pinch
             cropper.MultipleTouchEnabled = true;
             var pinchRecognizer = new UIPinchGestureRecognizer(HandlePinchGesture);
             HandlePinchGesture(pinchRecognizer);
             cropper.AddGestureRecognizer(pinchRecognizer);
 
+            SetOverLay();
             Add(cropper);
+
+            SetResizer();
+            SetPreviewImage();
+        }
+
+        private void SetOverLay()
+        {
+            if (overlay == null)
+            {
+                overlay = new CropperOverlayView(cropper.Frame, (float)PictureX, (float)PictureY);
+                Add(overlay);
+            }
+            else
+            {
+                overlay.Redraw(cropper.Frame);
+                overlay.SetNeedsDisplay();
+            }
         }
 
         nfloat cropperWidth;
@@ -212,6 +233,7 @@ namespace Plugin.ImageCrop
                     cropper.Frame = new CGRect(point, size);
                     cropper.SetNeedsDisplay();
                     SetResizer();
+                    SetOverLay();
                     //SetPreviewImage();
                     break;
                 case UIGestureRecognizerState.Ended:
@@ -322,6 +344,7 @@ namespace Plugin.ImageCrop
 
                 //SetPreviewImage();
                 SetResizer();
+                SetOverLay();
             }
             else if (resizeCropper)
             {
@@ -341,6 +364,8 @@ namespace Plugin.ImageCrop
                                 
                 //SetPreviewImage();
                 SetResizer();
+                SetOverLay();
+
             }
         }
 
