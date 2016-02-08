@@ -24,13 +24,19 @@ namespace Plugin.ImageCrop
         
         nfloat previewImageSize = 100;
         int cropperStartSize = 200;
-        int cropperMinSize = 60;
+        int cropperMinWidth = 100;
+        int cropperMinHeight = 100;
         double maxResizeFactor = 1;
         double cropperAspectRatio = 1;
         nfloat cropperTransparency = 0.6f;
-        nfloat cropperLineWidth = 5;
+        nfloat cropperLineWidth = 3;
         nfloat marginY = 60;
         nfloat marginX = 0;
+
+        nfloat cropperWidth;
+        nfloat cropperHeight;
+        nfloat cropperX;
+        nfloat cropperY;
         
         public event EventHandler OnSaved;
 
@@ -45,7 +51,9 @@ namespace Plugin.ImageCrop
             _croppedImageHeight = croppedImageHeight;
 
             if (_croppedImageWidth != 0 && _croppedImageHeight != 0)
-                SetCropperAspectRatio((double)_croppedImageWidth, (double)_croppedImageHeight);
+            {
+                SetCropperAspectRatio((double)_croppedImageWidth, (double)_croppedImageHeight);                
+            }
         }
 
         public override void ViewDidLoad()
@@ -63,22 +71,22 @@ namespace Plugin.ImageCrop
             picture.Frame = new CGRect(marginX, marginY, (int)scaledPicture.Size.Width, (int)scaledPicture.Size.Height);
 
             Add(picture);
-
-            //SetCropper();
-
+            
             resizer = new CropperResizerView(cropperColor, cropperTransparency, cropperLineWidth);
             Add(resizer);
-                                    
-            //SetOverLay();
+                           
             SetCropper();
-            //SetResizer();
-            //SetPreviewImage();
 
             var cancelButton = AddButton("Cancel", 150f, 20f, UIControlContentHorizontalAlignment.Left);
             cancelButton.TouchUpInside += cancelButton_TouchUpInside;
 
             var saveButton = AddButton("Save", 150f, 20f, UIControlContentHorizontalAlignment.Right);
             saveButton.TouchUpInside += saveButton_TouchUpInside;                        
+        }
+
+        public override bool PrefersStatusBarHidden()
+        {
+            return true;
         }
 
         private UIButton AddButton(string title, nfloat width, nfloat margin, UIControlContentHorizontalAlignment contentHorizontalAlignment)
@@ -100,12 +108,7 @@ namespace Plugin.ImageCrop
         {
             DismissViewController(true, null);
         }
-
-        public override bool PrefersStatusBarHidden()
-        {
-            return true;
-        }
-                    
+                                    
         void saveButton_TouchUpInside(object sender, EventArgs e)
         {
             var resizedImage = previewImage.Image;
@@ -129,6 +132,15 @@ namespace Plugin.ImageCrop
             {
                 Console.WriteLine("NOT saved as " + _picturePath + " because" + err.LocalizedDescription);
             }
+        }
+
+        private void SetCropperMinSize()
+        {
+            //if (_croppedImageHeight > 0 || _croppedImageWidth > 0)
+            //{
+            //    cropperMinWidth = (int)(_croppedImageWidth * maxResizeFactor);
+            //    cropperMinHeight = (int)(_croppedImageHeight * maxResizeFactor);
+            //}
         }
 
         private void SetPreviewImage()
@@ -160,8 +172,10 @@ namespace Plugin.ImageCrop
                 (float)(cropper.Frame.Height / maxResizeFactor));           
         }
 
+
+
         /// <summary>
-        /// The resizer triangle to resize the cropper.
+        /// Sets the resizer triangle to resize the cropper.
         /// </summary>
         private void SetResizer()
         {
@@ -172,6 +186,9 @@ namespace Plugin.ImageCrop
                 resizerSize);
         }
 
+        /// <summary>
+        /// Sets the cropper rectangle
+        /// </summary>
         private void SetCropper()
         {
             PointF centerCropperLocation = new PointF(
@@ -196,6 +213,9 @@ namespace Plugin.ImageCrop
             SetPreviewImage();
         }
 
+        /// <summary>
+        /// Sets the overlay
+        /// </summary>
         private void SetOverLay()
         {
             if (overlay == null)
@@ -209,11 +229,7 @@ namespace Plugin.ImageCrop
                 overlay.SetNeedsDisplay();
             }
         }
-
-        nfloat cropperWidth;
-        nfloat cropperHeight;
-        nfloat cropperX;
-        nfloat cropperY;
+                
         public void HandlePinchGesture(UIPinchGestureRecognizer sender)
         {
             resizeCropper = false;
@@ -263,6 +279,7 @@ namespace Plugin.ImageCrop
         {
             var sourceSize = sourceImage.Size;
             maxResizeFactor = Math.Min(maxWidth / sourceSize.Width, maxHeight / sourceSize.Height);
+            SetCropperMinSize();
             if (maxResizeFactor > 1) return sourceImage;
             float width = (float)maxResizeFactor * (float)sourceSize.Width;
             float height = (float)maxResizeFactor * (float)sourceSize.Height;
@@ -415,16 +432,16 @@ namespace Plugin.ImageCrop
             }
 
             // restrict to minimum width
-            if (width < cropperMinSize)
+            if (width < cropperMinWidth)
             {
-                width = (nfloat)cropperMinSize;
+                width = (nfloat)cropperMinWidth;
                 height = width / (nfloat)cropperAspectRatio;
             }
 
             // restrict to minimum height
-            if (height < cropperMinSize)
+            if (height < cropperMinHeight)
             {
-                height = (nfloat)cropperMinSize;
+                height = (nfloat)cropperMinHeight;
                 width = height * (nfloat)cropperAspectRatio;
             }
 

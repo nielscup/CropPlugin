@@ -60,7 +60,8 @@ namespace ImageCropTest.iOS
             if (imgData.Save(picturePath, false, out err))
             {
                 Console.WriteLine("saved as " + picturePath);
-                CrossImageCrop.Current.CropImage(picturePath, () => SetPicture());
+                //CrossImageCrop.Current.CropImage(picturePath, () => SetPicture());
+                CrossImageCrop.Current.CropImage(picturePath, () => SetPicture(), 300, 300);
             }
             else
             {
