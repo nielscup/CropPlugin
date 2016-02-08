@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata minClientVersion="2.8.1">
+    <id>Plugin.ImageCrop</id>
+    <version>0.0.3</version>
+    <title>ImageCrop Plugin</title>
+    <authors>Niels Cup</authors>
+    <owners>Niels Cup</owners>
+    <licenseUrl>http://cup-it.net/</licenseUrl>
+    <projectUrl>http://cup-it.net/</projectUrl>
+    <!--Default Icon, a template can be found:  https://raw.githubusercontent.com/jamesmontemagno/Xamarin-Templates/master/Plugins-Templates/icons/plugin_icon.png-->
+    <iconUrl>https://pbs.twimg.com/profile_images/463679742076387328/VnPmeVeO.jpeg</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>
+      Crop images with iOS and Android
+    </description>
+    <summary>ImageCrop Plugin for Xamarin iOS and Android.</summary>
+    <tags>xamarin, pcl, xam.pcl, plugin, plugin for xamarin, android, ios</tags>
+    <dependencies>
+    </dependencies>
+  </metadata>
+  <files>
+
+    <!--Core-->
+    <file src="ImageCrop/Plugin.ImageCrop/bin/Release/Plugin.ImageCrop.dll" target="lib\portable-net45+win+wpa81+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10\Plugin.ImageCrop.dll" />
+    <file src="ImageCrop/Plugin.ImageCrop/bin/Release/Plugin.ImageCrop.Abstractions.dll" target="lib\portable-net45+win+wpa81+MonoTouch10+MonoAndroid10+xamarinmac20+xamarinios10\Plugin.ImageCrop.Abstractions.dll" />
+                                                                                        
+    <!--Xamarin.Android-->
+    <file src="ImageCrop/Plugin.ImageCrop.Android/bin/Release/Plugin.ImageCrop.Abstractions.dll" target="lib\MonoAndroid10\Plugin.ImageCrop.Abstractions.dll" />
+    <file src="ImageCrop/Plugin.ImageCrop.Android/bin/Release/Plugin.ImageCrop.dll" target="lib\MonoAndroid10\Plugin.ImageCrop.dll" />
+    
+    <!--Xamarin.iOS-->
+    <file src="ImageCrop/Plugin.ImageCrop.iOSUnified/bin/iPhone/Release/Plugin.ImageCrop.Abstractions.dll" target="lib\Xamarin.iOS10\Plugin.ImageCrop.Abstractions.dll" />
+    <file src="ImageCrop/Plugin.ImageCrop.iOSUnified/bin/iPhone/Release/Plugin.ImageCrop.dll" target="lib\Xamarin.iOS10\Plugin.ImageCrop.dll"/>   
+  </files>
+</package>
