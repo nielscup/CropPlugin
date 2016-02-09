@@ -41,12 +41,14 @@ namespace Plugin.ImageCrop
         public event EventHandler OnSaved;
 
         string _picturePath;
+        string _croppedPicturePath;
         int _croppedImageWidth;
         int _croppedImageHeight;
 
-        public CropImageViewController(string path, int croppedImageWidth = 0, int croppedImageHeight = 0)
+        public CropImageViewController(string path, string croppedPath, int croppedImageWidth = 0, int croppedImageHeight = 0)
         {
             _picturePath = path;
+            _croppedPicturePath = croppedPath;
             _croppedImageWidth = croppedImageWidth;
             _croppedImageHeight = croppedImageHeight;
 
@@ -118,9 +120,9 @@ namespace Plugin.ImageCrop
             
             NSData imgData = resizedImage.AsJPEG();
             NSError err = null;
-            if (imgData.Save(_picturePath, false, out err))
+            if (imgData.Save(_croppedPicturePath, false, out err))
             {
-                Console.WriteLine("saved as " + _picturePath);
+                Console.WriteLine("saved as " + _croppedPicturePath);
                 
                 DismissViewController(true, null);
                 var obj = new NSDictionary();
@@ -130,7 +132,7 @@ namespace Plugin.ImageCrop
             }
             else
             {
-                Console.WriteLine("NOT saved as " + _picturePath + " because" + err.LocalizedDescription);
+                Console.WriteLine("NOT saved as " + _croppedPicturePath + " because" + err.LocalizedDescription);
             }
         }
 

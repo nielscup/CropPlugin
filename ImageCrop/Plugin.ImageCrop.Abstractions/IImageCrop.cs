@@ -11,19 +11,21 @@ namespace Plugin.ImageCrop.Abstractions
         /// <summary>
         /// Crop Image
         /// </summary>
-        /// <param name="imagePath">The path to the image to be cropped</param>
+        /// <param name="imagePath">The path to the image to be cropped. example: ../pictures/picture.jpg</param>
+        /// <param name="croppedImagePath">The path to the image after cropping. This can be the same as imagePath, the image will then be overwritten. example: ../pictures/picture-cropped.jpg</param>
         /// <param name="callback">The action to execute after cropping</param>
         /// <param name="croppedImageWidth">The width of the image after cropping</param>
         /// <param name="croppedImageHeight">The height of the image after cropping</param>
         /// <returns></returns>
-        Task CropImage(string imagePath, Action callback, int croppedImageWidth, int croppedImageHeight);
+        Task CropImage(string imagePath, string croppedImagePath, Action callback, int croppedImageWidth, int croppedImageHeight);
 
         /// <summary>
         /// Crop Image
         /// </summary>
-        /// <param name="imagePath">The path to the image to be cropped</param>
+        /// <param name="imagePath">The path to the image to be cropped. example: ../pictures/picture.jpg</param>
+        /// /// <param name="croppedImagePath">The path to the image after cropping. This can be the same as imagePath, the image will then be overwritten. example: ../pictures/picture-cropped.jpg</param>
         /// <param name="callback">The action to execute after cropping</param>
         /// <returns></returns>
-        Task CropImage(string imagePath, Action callback);
+        Task CropImage(string imagePath, string croppedImagePath, Action callback);
     }
 }

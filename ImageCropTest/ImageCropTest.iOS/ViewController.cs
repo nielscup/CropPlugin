@@ -14,6 +14,7 @@ namespace ImageCropTest.iOS
         int yPos = 50;
         const int defaultSize = 300;
         string picturePath;
+        string croppedPicturePath;
 
         public ViewController(IntPtr handle) : base(handle) { }
 
@@ -54,26 +55,27 @@ namespace ImageCropTest.iOS
             var picture = obj.ValueForKey(new NSString("UIImagePickerControllerOriginalImage")) as UIImage;
             var documentsDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
             picturePath = System.IO.Path.Combine(documentsDirectory, "picture.jpg"); // hardcoded filename, overwritten each time
+            croppedPicturePath = System.IO.Path.Combine(documentsDirectory, "picture-cropped.jpg");
             NSData imgData = picture.AsJPEG();
             NSError err = null;
             if (imgData.Save(picturePath, false, out err))
             {
-                Console.WriteLine("saved as " + picturePath);
-                CrossImageCrop.Current.CropImage(picturePath, () => SetPicture());
-                //CrossImageCrop.Current.CropImage(picturePath, () => SetPicture(), 300, 300);
+                SetPicture(picturePath);
+                CrossImageCrop.Current.CropImage(picturePath, picturePath, () => SetPicture(croppedPicturePath));
+                //CrossImageCrop.Current.CropImage(picturePath, croppedPicturePath, () => SetPicture(), 300, 300);
             }
             else
             {
-                Console.WriteLine("NOT saved as " + picturePath + " because" + err.LocalizedDescription);
+                Console.WriteLine("NOT saved as " + croppedPicturePath + " because" + err.LocalizedDescription);
             }
         }
                                 
-        private void SetPicture()
+        private void SetPicture(string path)
         {
-            if (string.IsNullOrEmpty(picturePath))
+            if (string.IsNullOrEmpty(path))
                 return;
 
-            _picture.Image = new UIImage(picturePath);
+            _picture.Image = new UIImage(path);
 
             var factorW = defaultSize / _picture.Image.Size.Width;
             var factorH = defaultSize / _picture.Image.Size.Height;

@@ -14,16 +14,16 @@ namespace Plugin.ImageCrop
     {
         Action _callback;
 
-        public async Task CropImage(string imagePath, Action callback)
+        public async Task CropImage(string imagePath, string croppedImagePath, Action callback)
         {
-            await CropImage(imagePath, callback, 0, 0);
+            await CropImage(imagePath, croppedImagePath, callback, 0, 0);
         }
 
-        public async Task CropImage(string imagePath, Action callback, int croppedImageWidth, int croppedImageHeight)        
+        public async Task CropImage(string imagePath, string croppedImagePath, Action callback, int croppedImageWidth, int croppedImageHeight)        
         {
             try
             {
-                var _cropImageViewController = new CropImageViewController(imagePath, croppedImageWidth, croppedImageHeight);
+                var _cropImageViewController = new CropImageViewController(imagePath, croppedImagePath, croppedImageWidth, croppedImageHeight);
                 _cropImageViewController.OnSaved += cropImageViewController_OnSaved;
                 _callback = callback;
                 
