@@ -6,8 +6,8 @@
     <title>ImageCrop Plugin</title>
     <authors>Niels Cup</authors>
     <owners>Niels Cup</owners>
-    <licenseUrl>http://cup-it.net/</licenseUrl>
-    <projectUrl>http://cup-it.net/</projectUrl>
+    <licenseUrl>https://github.com/nielscup/ImageCrop/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/nielscup/ImageCrop</projectUrl>
     <!--Default Icon, a template can be found:  https://raw.githubusercontent.com/jamesmontemagno/Xamarin-Templates/master/Plugins-Templates/icons/plugin_icon.png-->
     <iconUrl>https://pbs.twimg.com/profile_images/463679742076387328/VnPmeVeO.jpeg</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>

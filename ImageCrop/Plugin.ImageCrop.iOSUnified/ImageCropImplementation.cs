@@ -32,7 +32,7 @@ namespace Plugin.ImageCrop
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Unable to share text" + ex.Message);
+                Console.WriteLine("Unable to crop image" + ex.Message);
             }
         }
         
