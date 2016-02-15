@@ -19,3 +19,10 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+Notice & Credits:
+The Android part of this project is based on these projects: 
+https://github.com/markuspalme/cropimage-xamarin
+https://github.com/MMP-forTour/cropimage
+https://github.com/biokys/cropimage
+These projects are licensed under MIT and Apache: http://www.apache.org/licenses/LICENSE-2.0
