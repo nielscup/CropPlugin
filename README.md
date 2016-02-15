@@ -48,3 +48,8 @@ CrossImageCrop.Current.CropImage(
 		// Do something with PicturePath 
 	}, 300, 300);
 ```
+
+#### Credits
+* [cropimage-xamarin by markuspalme](https://github.com/markuspalme/cropimage-xamarin)
+* [cropimage by MMP-forTour](https://github.com/MMP-forTour/cropimage)
+* [cropimage by biokys](https://github.com/biokys/cropimage)
