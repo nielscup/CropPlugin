@@ -11,7 +11,7 @@ nuget pack Plugin.ImageCrop.nuspec
 
 **Supports**
 * Xamarin.iOS (Unified)
-* Xamarin.Android (WORK IN PROGRESS)
+* Xamarin.Android (based on [this project](https://github.com/markuspalme/cropimage-xamarin))
 
 ### API Usage
 
