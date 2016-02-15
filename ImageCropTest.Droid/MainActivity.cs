@@ -17,40 +17,92 @@ namespace ImageCropTest.Droid
         string picturePath;
         string croppedPicturePath;
         ImageView imageView;
+        CropImageView cropImageView;
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
             
             var mainLayout = new LinearLayout(this){ Orientation = Orientation.Vertical};
             
-            var buttonlayout = new LinearLayout(this)
+            var buttonlayout1 = new LinearLayout(this)
             {
                 LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)                
+            };
+
+            var buttonlayout2 = new LinearLayout(this)
+            {
+                LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
             };
 
             SetContentView(mainLayout);
                         
             var takePictureButton = new Button(this) { Text = "Take picture" };
-            var cropButton = new Button(this) { Text = "Crop 300x300" };
-            var freeCropButton = new Button(this) { Text = "Crop" };
+            var crop300x300Button1 = new Button(this) { Text = "Crop 300x300" };
+            var crop200x300Button1 = new Button(this) { Text = "Crop 200x300" };
+            var crop300x200Button1 = new Button(this) { Text = "Crop 300x200" };
+            var freeCropButton1 = new Button(this) { Text = "Crop" };
             var shareButton = new Button(this) { Text = "Share" };
 
+            var crop300x300Button2 = new Button(this) { Text = "Crop 300x300" };
+            var crop200x300Button2 = new Button(this) { Text = "Crop 200x300" };
+            var crop300x200Button2 = new Button(this) { Text = "Crop 300x200" };
+            var freeCropButton2 = new Button(this) { Text = "Crop" };
+            var saveButton = new Button(this) { Text = "Save" };
+
             imageView = new ImageView(this);
-            imageView.LayoutParameters = new ViewGroup.LayoutParams(300, 300);            
-            
-            buttonlayout.AddView(takePictureButton);
-            buttonlayout.AddView(cropButton);
-            buttonlayout.AddView(freeCropButton);
-            buttonlayout.AddView(shareButton);
-            
-            mainLayout.AddView(buttonlayout);
+            imageView.LayoutParameters = new ViewGroup.LayoutParams(300, 300);
+
+            mainLayout.AddView(takePictureButton);
+
+            // External crop buttons (opens image crop in a new activity)
+            buttonlayout1.AddView(crop300x300Button1);
+            buttonlayout1.AddView(crop200x300Button1);
+            buttonlayout1.AddView(crop300x200Button1);
+            buttonlayout1.AddView(freeCropButton1);
+
+            mainLayout.AddView(shareButton);
+
+            // Internal crop buttons (crops image in the same activity)
+            buttonlayout2.AddView(crop300x300Button2);
+            buttonlayout2.AddView(crop200x300Button2);
+            buttonlayout2.AddView(crop300x200Button2);
+            buttonlayout2.AddView(freeCropButton2);
+            buttonlayout2.AddView(saveButton);
+
+            mainLayout.AddView(buttonlayout1);
             mainLayout.AddView(imageView);
+            mainLayout.AddView(buttonlayout2);
+
+            // Create and add crop view
+            cropImageView = new CropImageView(this, null);
+            //var cropImageViewLayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent);
+            //cropImageView.LayoutParameters = cropImageViewLayoutParameters;            
+            mainLayout.AddView(cropImageView);
+            
 
             takePictureButton.Click += takePictureButton_Click;
 
-            cropButton.Click += cropButton_Click;
-            freeCropButton.Click += freeCropButton_Click;
+            crop300x300Button1.Click += (s,e) =>  Crop(300, 300);
+            crop200x300Button1.Click += (s, e) => Crop(200, 300);
+            crop300x200Button1.Click += (s, e) => Crop(300, 200);
+            freeCropButton1.Click  += (s,e) =>  Crop(0, 0);
+
+            crop300x300Button2.Click += (s, e) => Crop(300, 300, false);
+            crop200x300Button2.Click += (s, e) => Crop(200, 300, false);
+            crop300x200Button2.Click += (s, e) => Crop(300, 200, false);
+            freeCropButton2.Click += (s, e) => Crop(0, 0, false);
+            saveButton.Click += saveButton_Click;
+
             shareButton.Click += shareButton_Click;
+        }
+
+        void saveButton_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(croppedPicturePath))
+                return;
+            
+            cropImageView.CropAndSave(croppedPicturePath);
+            SetPicture(croppedPicturePath);
         }
 
         void shareButton_Click(object sender, EventArgs e)
@@ -65,29 +117,26 @@ namespace ImageCropTest.Droid
         {
             TakePicture();
         }
-
-        void cropButton_Click(object sender, EventArgs e)
-        {
-            Crop(300, 300);
-        }
-
-        void freeCropButton_Click(object sender, EventArgs e)
-        {
-            Crop(0, 0);
-        }
-
-        void Crop(int width, int height)
+                
+        void Crop(int width, int height, bool useExternalCropper = true)
         {
             if (string.IsNullOrEmpty(picturePath))
                 return;
 
+            // reset the picture to the taken picture
+            SetPicture(picturePath);
+
             croppedPicturePath = picturePath.Replace(".", "-cropped.");
-            CrossImageCrop.Current.CropImage(picturePath, croppedPicturePath, () => SetPicture(croppedPicturePath), width, height);
+
+            if (useExternalCropper)
+                CrossImageCrop.Current.CropImage(picturePath, croppedPicturePath, () => SetPicture(croppedPicturePath), width, height);
+            else            
+                cropImageView.SetImage(picturePath, width, height);
         }
 
         private void SetPicture(string path)
         {
-            imageView.SetImageURI(Android.Net.Uri.Parse(path));           
+            imageView.SetImageURI(Android.Net.Uri.Parse(path));            
         }
 
         /// <summary>

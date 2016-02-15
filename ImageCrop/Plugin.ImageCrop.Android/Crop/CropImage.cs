@@ -30,8 +30,6 @@ namespace Plugin.ImageCrop
     /// <summary>
     /// The activity can crop specific region of interest from an image.
     /// </summary>
-	//[Register("Ibridge.PushNotifications.ClientAppsMvx.Droid.CropImage")]
-	//[Activity(Name="ibridge.pushnotifications.clientappsmvx.droid.crop.CropImage")]
 	[Activity]
 	public class CropImage : MonitoredActivity
     {
@@ -40,18 +38,18 @@ namespace Plugin.ImageCrop
         // These are various options can be specified in the intent.
         private Bitmap.CompressFormat outputFormat = Bitmap.CompressFormat.Jpeg;
         private Android.Net.Uri saveUri = null;
-        private int aspectX, aspectY;
         private Handler mHandler = new Handler();
 
         // These options specifiy the output image size and whether we should
         // scale the output to fit it (or just crop it).
-        private int outputX, outputY;
-        private bool scale;
+        private int outputWidth, outputHeight;
+        private bool scale = true;
         private bool scaleUp = true;
 
-        private CropImageView imageView;
+        private CropImageView cropImageView;
+        private HighlightView highlightView;
         private Bitmap bitmap;
-
+        
         private string imagePath;
 
         private const int NO_STORAGE_ERROR = -1;
@@ -60,12 +58,6 @@ namespace Plugin.ImageCrop
         #endregion
 
         #region Properties
-
-        public HighlightView Crop
-        {
-            set;
-            get;
-        }
 
         /// <summary>
         /// Whether the "save" button is already clicked.
@@ -91,21 +83,17 @@ namespace Plugin.ImageCrop
 
             SetContentView(mainLayout);
             
-            imageView = new CropImageView(this, null);
+            cropImageView = new CropImageView(this, null);
             var imageViewLayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent);
-            imageView.LayoutParameters = imageViewLayoutParameters;
-
+            cropImageView.LayoutParameters = imageViewLayoutParameters;
+            
             var saveButton = new Button(this) { Text = "Save" };
             var cancelButton = new Button(this) { Text = "Cancel" };
-            //var rotateLeftButton = new Button(this) { Text = "Rotate Left" };
-            //var rotateRightButton = new Button(this) { Text = "Rotate Right" };
                         
             buttonLayout.AddView(cancelButton);
             buttonLayout.AddView(saveButton);
-            //buttonLayout.AddView(rotateLeftButton);
-            //buttonLayout.AddView(rotateRightButton);
 
-            mainLayout.AddView(imageView);
+            mainLayout.AddView(cropImageView);
             mainLayout.AddView(buttonLayout);
             
             showStorageToast(this);
@@ -117,23 +105,17 @@ namespace Plugin.ImageCrop
                 imagePath = extras.GetString("image-path");
                 var croppedImagePath = extras.GetString("cropped-image-path");
 
-				// update path otherwise image will not update in UI...
-				//saveUri = getImageUri(imagePath.Replace(".", "-cropped."));
-                saveUri = getImageUri(croppedImagePath);
+                saveUri = Util.GetImageUri(croppedImagePath);
                 if (extras.GetString(MediaStore.ExtraOutput) != null)
                 {
-                    saveUri = getImageUri(extras.GetString(MediaStore.ExtraOutput));
+                    saveUri = Util.GetImageUri(extras.GetString(MediaStore.ExtraOutput));
                 }
 
-                bitmap = getBitmap(imagePath);
+                bitmap = Util.GetBitmap(imagePath, ContentResolver);
 
-                aspectX = extras.GetInt("aspectX");
-                aspectY = extras.GetInt("aspectY");
-                outputX = extras.GetInt("outputX");
-                outputY = extras.GetInt("outputY");
-                scale = extras.GetBoolean("scale", true);
-                scaleUp = extras.GetBoolean("scaleUpIfNeeded", true);
-
+                outputWidth = Poco.CroppedImageWidth;
+                outputHeight = Poco.CroppedImageHeight;
+                
                 if (extras.GetString("outputFormat") != null)
                 {
                     outputFormat = Bitmap.CompressFormat.ValueOf(extras.GetString("outputFormat"));
@@ -148,27 +130,20 @@ namespace Plugin.ImageCrop
 
             Window.AddFlags(WindowManagerFlags.Fullscreen);
 
-            saveButton.Click += (sender, e) => { onSaveClicked(); };
+            saveButton.Click += saveButton_Click;
             cancelButton.Click += (sender, e) => { SetResult(Result.Canceled); Finish(); };
 
-            //rotateLeftButton.Click += (o, e) =>
-            //{
-            //    bitmap = Util.rotateImage(bitmap, -90);
-            //    RotateBitmap rotateBitmap = new RotateBitmap(bitmap);
-            //    imageView.SetImageRotateBitmapResetBase(rotateBitmap, true);
-            //    addHighlightView();
-            //};
+            cropImageView.SetImage(imagePath, outputWidth, outputHeight);
+        }
 
-            //rotateRightButton.Click += (o, e) =>
-            //{
-            //    bitmap = Util.rotateImage(bitmap, 90);
-            //    RotateBitmap rotateBitmap = new RotateBitmap(bitmap);
-            //    imageView.SetImageRotateBitmapResetBase(rotateBitmap, true);
-            //    addHighlightView();
-            //};
+        void saveButton_Click(object sender, EventArgs e)
+        {
+            Bundle extras = new Bundle();
 
-            imageView.SetImageBitmapResetBase(bitmap, true);
-            addHighlightView();
+            var bmp = cropImageView.Crop();
+            BackgroundJob.StartBackgroundJob(this, null, "Saving image", () => cropImageView.SaveOutput(bmp, saveUri), mHandler);
+            SetResult(Result.Ok, new Intent(saveUri.ToString()).PutExtras(extras));
+            Finish();
         }
 
         protected override void OnDestroy()
@@ -183,201 +158,7 @@ namespace Plugin.ImageCrop
         #endregion
 
         #region Private helpers
-
-        private void addHighlightView()
-        {
-            Crop = new HighlightView(imageView);
-
-            int width = bitmap.Width;
-            int height = bitmap.Height;
-
-            Rect imageRect = new Rect(0, 0, width, height);
-
-            // make the default size about 4/5 of the width or height
-            int cropWidth = Math.Min(width, height) * 4 / 5;
-            int cropHeight = cropWidth;
-
-            if (aspectX != 0 && aspectY != 0)
-            {
-                if (aspectX > aspectY)
-                {
-                    cropHeight = cropWidth * aspectY / aspectX;
-                }
-                else
-                {
-                    cropWidth = cropHeight * aspectX / aspectY;
-                }
-            }
-
-            int x = (width - cropWidth) / 2;
-            int y = (height - cropHeight) / 2;
-
-            RectF cropRect = new RectF(x, y, x + cropWidth, y + cropHeight);
-            Crop.Setup(imageView.ImageMatrix, imageRect, cropRect, aspectX != 0 && aspectY != 0);
-
-            imageView.ClearHighlightViews();
-            Crop.Focused = true;
-            imageView.AddHighlightView(Crop);
-        }
-
-        private Android.Net.Uri getImageUri(String path)
-        {
-            return Android.Net.Uri.FromFile(new Java.IO.File(path));
-        }
-
-        private Bitmap getBitmap(String path)
-        {
-            var uri = getImageUri(path);
-            System.IO.Stream ins = null;
-
-            try
-            {
-                int IMAGE_MAX_SIZE = 1024;
-                ins = ContentResolver.OpenInputStream(uri);
-
-                // Decode image size
-                BitmapFactory.Options o = new BitmapFactory.Options();
-                o.InJustDecodeBounds = true;
-
-                BitmapFactory.DecodeStream(ins, null, o);
-                ins.Close();
-
-                int scale = 1;
-                if (o.OutHeight > IMAGE_MAX_SIZE || o.OutWidth > IMAGE_MAX_SIZE)
-                {
-                    //scale = Math.Max(o.OutHeight / IMAGE_MAX_SIZE, o.OutWidth / IMAGE_MAX_SIZE);
-                    scale = (int)Math.Pow(2, (int)Math.Round(Math.Log(IMAGE_MAX_SIZE / (double)Math.Max(o.OutHeight, o.OutWidth)) / Math.Log(0.5)));
-                }
-
-                BitmapFactory.Options o2 = new BitmapFactory.Options();
-                o2.InSampleSize = (int)scale;
-                ins = ContentResolver.OpenInputStream(uri);
-                Bitmap b = BitmapFactory.DecodeStream(ins, null, o2);
-                ins.Close();
-
-                return b;
-            }
-            catch (Exception e)
-            {
-                Log.Error(GetType().Name, e.Message);
-            }
-
-            return null;
-        }
-
-        private void onSaveClicked()
-        {
-            // TODO this code needs to change to use the decode/crop/encode single
-            // step api so that we don't require that the whole (possibly large)
-            // bitmap doesn't have to be read into memory
-            if (Saving)
-            {
-                return;
-            }
-
-            Saving = true;
-
-            var r = Crop.CropRect;
-
-            int width = r.Width();
-            int height = r.Height();
-
-            Bitmap croppedImage = Bitmap.CreateBitmap(width, height, Bitmap.Config.Rgb565);
-            {
-                Canvas canvas = new Canvas(croppedImage);
-                Rect dstRect = new Rect(0, 0, width, height);
-                canvas.DrawBitmap(bitmap, r, dstRect, null);
-            }
-
-            // If the output is required to a specific size then scale or fill
-            if (outputX != 0 && outputY != 0)
-            {
-                if (scale)
-                {
-                    // Scale the image to the required dimensions
-                    Bitmap old = croppedImage;
-                    croppedImage = Util.transform(new Matrix(), croppedImage, outputX, outputY, scaleUp);
-                    if (old != croppedImage)
-                    {
-                        old.Recycle();
-                    }
-                }
-                else
-                {
-                    // Don't scale the image crop it to the size requested.
-                    // Create an new image with the cropped image in the center and
-                    // the extra space filled.              
-                    Bitmap b = Bitmap.CreateBitmap(outputX, outputY, Bitmap.Config.Rgb565);
-                    Canvas canvas = new Canvas(b);
-
-                    Rect srcRect = Crop.CropRect;
-                    Rect dstRect = new Rect(0, 0, outputX, outputY);
-
-                    int dx = (srcRect.Width() - dstRect.Width()) / 2;
-                    int dy = (srcRect.Height() - dstRect.Height()) / 2;
-
-                    // If the srcRect is too big, use the center part of it.
-                    srcRect.Inset(Math.Max(0, dx), Math.Max(0, dy));
-
-                    // If the dstRect is too big, use the center part of it.
-                    dstRect.Inset(Math.Max(0, -dx), Math.Max(0, -dy));
-
-                    // Draw the cropped bitmap in the center
-                    canvas.DrawBitmap(bitmap, srcRect, dstRect, null);
-
-                    // Set the cropped bitmap as the new bitmap
-                    croppedImage.Recycle();
-                    croppedImage = b;
-                }
-            }
-
-            // Return the cropped image directly or save it to the specified URI.
-            Bundle myExtras = Intent.Extras;
-
-            if (myExtras != null && (myExtras.GetParcelable("data") != null || myExtras.GetBoolean("return-data")))
-            {
-                Bundle extras = new Bundle();
-                extras.PutParcelable("data", croppedImage);
-                SetResult(Result.Ok, (new Intent()).SetAction("inline-data").PutExtras(extras));
-                Finish();
-            }
-            else
-            {
-                Bitmap b = croppedImage;
-                BackgroundJob.StartBackgroundJob(this, null, "Saving image", () => saveOutput(b), mHandler);
-            }
-        }
-
-        private void saveOutput(Bitmap croppedImage)
-        {
-            if (saveUri != null)
-            {
-                try
-                {
-                    using (var outputStream = ContentResolver.OpenOutputStream(saveUri))
-                    {
-                        if (outputStream != null)
-                        {
-                            croppedImage.Compress(outputFormat, 75, outputStream);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(this.GetType().Name, ex.Message);
-                }
-
-                Bundle extras = new Bundle();
-                SetResult(Result.Ok, new Intent(saveUri.ToString()).PutExtras(extras));
-            }
-            else
-            {
-                Log.Error(this.GetType().Name, "not defined image url");
-            }
-            croppedImage.Recycle();
-            Finish();
-        }
-
+                
         private static void showStorageToast(Activity activity)
         {
             showStorageToast(activity, calculatePicturesRemaining());
@@ -432,3 +213,154 @@ namespace Plugin.ImageCrop
         #endregion
     }
 }
+
+
+//private void addHighlightView()
+//{
+//    highlightView = new HighlightView(cropImageView);
+
+//    int width = bitmap.Width;
+//    int height = bitmap.Height;
+
+//    Rect imageRect = new Rect(0, 0, width, height);
+
+//    // make the default size about 4/5 of the width or height
+//    int cropWidth = width * 4/5; //Math.Min(width, height) * 4 / 5;
+//    int cropHeight = height * 4/5;
+
+//    if (outputWidth != 0 && outputHeight != 0)
+//    {
+//        if (outputWidth > outputHeight)
+//        {
+//            cropHeight = cropWidth * outputHeight / outputWidth;
+//        }
+//        else
+//        {
+//            cropWidth = cropHeight * outputWidth / outputHeight;
+//        }
+//    }
+
+//    int x = (width - cropWidth) / 2;
+//    int y = (height - cropHeight) / 2;
+
+//    RectF cropRect = new RectF(x, y, x + cropWidth, y + cropHeight);
+//    highlightView.Setup(cropImageView.ImageMatrix, imageRect, cropRect, outputWidth != 0 && outputHeight != 0);
+
+//    cropImageView.ClearHighlightViews();
+//    highlightView.Focused = true;
+//    cropImageView.AddHighlightView(highlightView);
+//}
+
+//private void onSaveClicked()
+//{
+//    // TODO this code needs to change to use the decode/crop/encode single
+//    // step api so that we don't require that the whole (possibly large)
+//    // bitmap doesn't have to be read into memory
+//    if (Saving)
+//    {
+//        return;
+//    }
+
+//    Saving = true;
+
+//    var r = highlightView.CropRect;
+
+//    int width = r.Width();
+//    int height = r.Height();
+
+//    Bitmap croppedImage = Bitmap.CreateBitmap(width, height, Bitmap.Config.Rgb565);
+//    {
+//        Canvas canvas = new Canvas(croppedImage);
+//        Rect dstRect = new Rect(0, 0, width, height);
+//        canvas.DrawBitmap(bitmap, r, dstRect, null);
+//    }
+
+//    // If the output is required to a specific size then scale or fill
+//    if (outputWidth != 0 && outputHeight != 0)
+//    {
+//        if (scale)
+//        {
+//            // Scale the image to the required dimensions
+//            Bitmap old = croppedImage;
+//            croppedImage = Util.transform(new Matrix(), croppedImage, outputWidth, outputHeight, scaleUp);
+//            if (old != croppedImage)
+//            {
+//                old.Recycle();
+//            }
+//        }
+//        else
+//        {
+//            // Don't scale the image crop it to the size requested.
+//            // Create an new image with the cropped image in the center and
+//            // the extra space filled.              
+//            Bitmap b = Bitmap.CreateBitmap(outputWidth, outputHeight, Bitmap.Config.Rgb565);
+//            Canvas canvas = new Canvas(b);
+
+//            Rect srcRect = highlightView.CropRect;
+//            Rect dstRect = new Rect(0, 0, outputWidth, outputHeight);
+
+//            int dx = (srcRect.Width() - dstRect.Width()) / 2;
+//            int dy = (srcRect.Height() - dstRect.Height()) / 2;
+
+//            // If the srcRect is too big, use the center part of it.
+//            srcRect.Inset(Math.Max(0, dx), Math.Max(0, dy));
+
+//            // If the dstRect is too big, use the center part of it.
+//            dstRect.Inset(Math.Max(0, -dx), Math.Max(0, -dy));
+
+//            // Draw the cropped bitmap in the center
+//            canvas.DrawBitmap(bitmap, srcRect, dstRect, null);
+
+//            // Set the cropped bitmap as the new bitmap
+//            croppedImage.Recycle();
+//            croppedImage = b;
+//        }
+//    }
+
+//    // Return the cropped image directly or save it to the specified URI.
+//    Bundle myExtras = Intent.Extras;
+
+//    if (myExtras != null && (myExtras.GetParcelable("data") != null || myExtras.GetBoolean("return-data")))
+//    {
+//        Bundle extras = new Bundle();
+//        extras.PutParcelable("data", croppedImage);
+//        SetResult(Result.Ok, (new Intent()).SetAction("inline-data").PutExtras(extras));
+//        Finish();
+//    }
+//    else
+//    {
+//        Bitmap b = croppedImage;
+//        //saveOutput(b);
+//        BackgroundJob.StartBackgroundJob(this, null, "Saving image", () => saveOutput(b), mHandler);
+//    }
+//}
+
+//private void saveOutput(Bitmap croppedImage)
+//{
+//    if (saveUri != null)
+//    {
+//        try
+//        {
+//            using (var outputStream = ContentResolver.OpenOutputStream(saveUri))
+//            {
+//                if (outputStream != null)
+//                {
+//                    croppedImage.Compress(outputFormat, 75, outputStream);
+//                }
+//            }
+//        }
+//        catch (Exception ex)
+//        {
+//            Log.Error(this.GetType().Name, ex.Message);
+//        }
+
+//        Bundle extras = new Bundle();
+//        SetResult(Result.Ok, new Intent(saveUri.ToString()).PutExtras(extras));
+//    }
+//    else
+//    {
+//        Log.Error(this.GetType().Name, "not defined image url");
+//    }
+//    croppedImage.Recycle();
+//    Finish();
+//}

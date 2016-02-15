@@ -111,7 +111,7 @@ namespace Plugin.ImageCrop
         {
             SetImageBitmapResetBase(null, true);
         }
-
+                
         /// <summary>
         /// This function changes bitmap, reset base matrix according to the size
         /// of the bitmap, and optionally reset the supplementary matrix.

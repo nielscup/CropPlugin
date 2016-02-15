@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
+using Android.Content;
 using Android.Graphics;
+using Android.Util;
 using System;
 
 namespace Plugin.ImageCrop
@@ -151,6 +153,51 @@ namespace Plugin.ImageCrop
             }
 
             return b3;
+        }
+
+        public static Bitmap GetBitmap(String path, ContentResolver contentResolver)
+        {
+            var uri = GetImageUri(path);
+            System.IO.Stream ins = null;
+
+            try
+            {
+                int IMAGE_MAX_SIZE = 1024;
+                ins = contentResolver.OpenInputStream(uri);
+
+                // Decode image size
+                BitmapFactory.Options o = new BitmapFactory.Options();
+                o.InJustDecodeBounds = true;
+
+                BitmapFactory.DecodeStream(ins, null, o);
+                ins.Close();
+
+                int scale = 1;
+                if (o.OutHeight > IMAGE_MAX_SIZE || o.OutWidth > IMAGE_MAX_SIZE)
+                {
+                    //scale = Math.Max(o.OutHeight / IMAGE_MAX_SIZE, o.OutWidth / IMAGE_MAX_SIZE);
+                    scale = (int)Math.Pow(2, (int)Math.Round(Math.Log(IMAGE_MAX_SIZE / (double)Math.Max(o.OutHeight, o.OutWidth)) / Math.Log(0.5)));
+                }
+
+                BitmapFactory.Options o2 = new BitmapFactory.Options();
+                o2.InSampleSize = (int)scale;
+                ins = contentResolver.OpenInputStream(uri);
+                Bitmap b = BitmapFactory.DecodeStream(ins, null, o2);
+                ins.Close();
+
+                return b;
+            }
+            catch (Exception e)
+            {
+                Log.Error("GetBitmap", e.Message);
+            }
+
+            return null;
+        }
+
+        public static Android.Net.Uri GetImageUri(String path)
+        {
+            return Android.Net.Uri.FromFile(new Java.IO.File(path));
         }
     }
 }

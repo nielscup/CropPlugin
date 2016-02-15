@@ -57,11 +57,12 @@
     <Compile Include="Crop\MonitoredActivity.cs" />
     <Compile Include="Crop\RotateBitmap.cs" />
     <Compile Include="Crop\Util.cs" />
+    <Compile Include="Helpers.cs" />
+    <Compile Include="ImageCropFragment.cs" />
     <Compile Include="ImageCropImplementation.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Poco.cs" />
-    <Compile Include="TestActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

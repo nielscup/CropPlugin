@@ -56,15 +56,7 @@ namespace Plugin.ImageCrop.Crop
         }
 
         private void SetCropVariables(ref Intent cropIntent)
-        {
-            if (Poco.CroppedImageWidth > 0 && Poco.CroppedImageHeight > 0)
-            {
-                cropIntent.PutExtra("outputX", 300);
-                cropIntent.PutExtra("outputY", 300);
-                cropIntent.PutExtra("aspectX", 1);
-                cropIntent.PutExtra("aspectY", 1);
-            }
-
+        {            
             cropIntent.PutExtra("scale", "true");
             cropIntent.PutExtra("crop", "true");
         }  
