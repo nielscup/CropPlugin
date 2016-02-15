@@ -23,7 +23,7 @@ namespace Plugin.ImageCrop.Abstractions
         /// Crop Image
         /// </summary>
         /// <param name="imagePath">The path to the image to be cropped. example: ../pictures/picture.jpg</param>
-        /// /// <param name="croppedImagePath">The path to the image after cropping. This can be the same as imagePath, the image will then be overwritten. example: ../pictures/picture-cropped.jpg</param>
+        /// <param name="croppedImagePath">The path to the image after cropping. This can be the same as imagePath, the image will then be overwritten. example: ../pictures/picture-cropped.jpg</param>
         /// <param name="callback">The action to execute after cropping</param>
         /// <returns></returns>
         Task CropImage(string imagePath, string croppedImagePath, Action callback);

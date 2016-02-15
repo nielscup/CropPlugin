@@ -20,7 +20,7 @@ namespace Plugin.ImageCrop
         {
             _targetLocation = targetLocation;
             _size = size;
-            _color = color ?? UIColor.Red;
+            _color = color ?? UIColor.White;
             _transparancy = transparancy == 0 ? 0.8f : transparancy;
             _lineWidth = lineWidth == 0 ? 3f : lineWidth;
             

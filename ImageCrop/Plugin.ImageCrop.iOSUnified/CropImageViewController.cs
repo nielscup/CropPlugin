@@ -20,7 +20,7 @@ namespace Plugin.ImageCrop
         CropperResizerView resizer;
 
         nfloat resizerSize = 40;
-        UIColor cropperColor = UIColor.Red;
+        UIColor cropperColor = UIColor.White;
         
         nfloat previewImageSize = 100;
         int cropperStartSize = 200;
@@ -28,7 +28,7 @@ namespace Plugin.ImageCrop
         int cropperMinHeight = 100;
         double maxResizeFactor = 1;
         double cropperAspectRatio = 1;
-        nfloat cropperTransparency = 0.6f;
+        nfloat cropperTransparency = 0.8f;
         nfloat cropperLineWidth = 3;
         nfloat marginY = 60;
         nfloat marginX = 0;
@@ -138,11 +138,11 @@ namespace Plugin.ImageCrop
 
         private void SetCropperMinSize()
         {
-            //if (_croppedImageHeight > 0 || _croppedImageWidth > 0)
-            //{
-            //    cropperMinWidth = (int)(_croppedImageWidth * maxResizeFactor);
-            //    cropperMinHeight = (int)(_croppedImageHeight * maxResizeFactor);
-            //}
+            if (_croppedImageHeight > 0 || _croppedImageWidth > 0)
+            {
+                cropperMinWidth = Math.Max((int)(_croppedImageWidth * maxResizeFactor), cropperMinWidth);
+                cropperMinHeight = Math.Max((int)(_croppedImageHeight * maxResizeFactor), cropperMinHeight);
+            }
         }
 
         private void SetPreviewImage()
