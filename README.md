@@ -1,4 +1,4 @@
-# ImageCrop Plugin
+# ImageCrop Plugin for Xamarin
 
 Simple way to crop an image in Xamarin.iOS and Xamarin.Android
 
