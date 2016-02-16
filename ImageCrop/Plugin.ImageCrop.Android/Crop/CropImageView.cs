@@ -31,20 +31,20 @@ namespace Plugin.ImageCrop
     {
         #region Private members
 
-        private List<HighlightView> hightlightViews = new List<HighlightView>();
-        private HighlightView mMotionHighlightView = null;
-        private float mLastX;
-        private float mLastY;
-        private global::Plugin.ImageCrop.HighlightView.HitPosition motionEdge;
-        private Context context;
-        private bool saving;
-        private Bitmap.CompressFormat outputFormat = Bitmap.CompressFormat.Jpeg;
+        List<HighlightView> hightlightViews = new List<HighlightView>();
+        HighlightView mMotionHighlightView = null;
+        float mLastX;
+        float mLastY;
+        global::Plugin.ImageCrop.HighlightView.HitPosition motionEdge;
+        Context context;
+        bool saving;
+        Bitmap.CompressFormat outputFormat = Bitmap.CompressFormat.Jpeg;
         HighlightView highlightView;
         Bitmap bitmap;
         int outputWidth, outputHeight;
-        private bool scale = true;
-        private bool scaleUp = true;
-        private Handler mHandler = new Handler();
+        bool scale = true;
+        bool scaleUp = true;
+        Handler mHandler = new Handler();
 
         #endregion
 
@@ -332,12 +332,12 @@ namespace Plugin.ImageCrop
 
         #region Private helpers
 
-        public void ClearHighlightViews()
+        private void ClearHighlightViews()
         {
             this.hightlightViews.Clear();
         }
 
-        public void AddHighlightView(HighlightView hv)
+        private void AddHighlightView(HighlightView hv)
         {
             hightlightViews.Add(hv);
             Invalidate();
