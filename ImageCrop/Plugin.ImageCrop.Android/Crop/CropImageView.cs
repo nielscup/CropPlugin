@@ -26,6 +26,7 @@ using Android.Widget;
 
 namespace Plugin.ImageCrop
 {
+    [Register("plugin.imagecrop.android.CropImageView")]
     public class CropImageView : ImageViewTouchBase
     {
         #region Private members

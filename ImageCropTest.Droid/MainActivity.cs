@@ -37,22 +37,15 @@ namespace ImageCropTest.Droid
             SetContentView(mainLayout);
                         
             var takePictureButton = new Button(this) { Text = "Take picture" };
+            mainLayout.AddView(takePictureButton);
+
+            var shareButton = new Button(this) { Text = "Share" };
+            mainLayout.AddView(shareButton);
+
             var crop300x300Button1 = new Button(this) { Text = "Crop 300x300" };
             var crop200x300Button1 = new Button(this) { Text = "Crop 200x300" };
             var crop300x200Button1 = new Button(this) { Text = "Crop 300x200" };
-            var freeCropButton1 = new Button(this) { Text = "Crop" };
-            var shareButton = new Button(this) { Text = "Share" };
-
-            var crop300x300Button2 = new Button(this) { Text = "Crop 300x300" };
-            var crop200x300Button2 = new Button(this) { Text = "Crop 200x300" };
-            var crop300x200Button2 = new Button(this) { Text = "Crop 300x200" };
-            var freeCropButton2 = new Button(this) { Text = "Crop" };
-            var saveButton = new Button(this) { Text = "Save" };
-
-            imageView = new ImageView(this);
-            imageView.LayoutParameters = new ViewGroup.LayoutParams(300, 300);
-
-            mainLayout.AddView(takePictureButton);
+            var freeCropButton1 = new Button(this) { Text = "Crop" };            
 
             // External crop buttons (opens image crop in a new activity)
             buttonlayout1.AddView(crop300x300Button1);
@@ -60,13 +53,22 @@ namespace ImageCropTest.Droid
             buttonlayout1.AddView(crop300x200Button1);
             buttonlayout1.AddView(freeCropButton1);
 
-            mainLayout.AddView(shareButton);
+            var crop300x300Button2 = new Button(this) { Text = "Crop 300x300" };
+            var crop200x300Button2 = new Button(this) { Text = "Crop 200x300" };
+            var crop300x200Button2 = new Button(this) { Text = "Crop 300x200" };
+            var freeCropButton2 = new Button(this) { Text = "Crop" };
+            var cropViewButton2 = new Button(this) { Text = "Crop View" };
+            var saveButton = new Button(this) { Text = "Save" };
 
+            imageView = new ImageView(this);
+            imageView.LayoutParameters = new ViewGroup.LayoutParams(300, 300);                                              
+            
             // Internal crop buttons (crops image in the same activity)
             buttonlayout2.AddView(crop300x300Button2);
             buttonlayout2.AddView(crop200x300Button2);
             buttonlayout2.AddView(crop300x200Button2);
             buttonlayout2.AddView(freeCropButton2);
+            buttonlayout2.AddView(cropViewButton2);
             buttonlayout2.AddView(saveButton);
 
             mainLayout.AddView(buttonlayout1);
@@ -91,8 +93,9 @@ namespace ImageCropTest.Droid
             crop200x300Button2.Click += (s, e) => Crop(200, 300, false);
             crop300x200Button2.Click += (s, e) => Crop(300, 200, false);
             freeCropButton2.Click += (s, e) => Crop(0, 0, false);
+            
+            cropViewButton2.Click += (s, e) => StartActivity(typeof(CropActivity));
             saveButton.Click += saveButton_Click;
-
             shareButton.Click += shareButton_Click;
         }
 
@@ -115,7 +118,12 @@ namespace ImageCropTest.Droid
                 
         void takePictureButton_Click(object sender, EventArgs e)
         {
-            TakePicture();
+            //TakePicture();
+            Intent intent = new Intent(MediaStore.ActionImageCapture);
+            var file = new Java.IO.File(CreateDirectoryForPictures(), string.Format("myPhoto.jpg", System.Guid.NewGuid()));
+            picturePath = file.Path;
+            intent.PutExtra(MediaStore.ExtraOutput, Android.Net.Uri.FromFile(file));
+            StartActivityForResult(intent, 0);
         }
                 
         void Crop(int width, int height, bool useExternalCropper = true)
@@ -139,17 +147,17 @@ namespace ImageCropTest.Droid
             imageView.SetImageURI(Android.Net.Uri.Parse(path));            
         }
 
-        /// <summary>
-        /// TEST Front Facing Camera
-        /// </summary>
-        private void TakePicture()
-        {
-            Intent intent = new Intent(MediaStore.ActionImageCapture);
-            var file = new Java.IO.File(CreateDirectoryForPictures(), string.Format("myPhoto.jpg", System.Guid.NewGuid()));
-            picturePath = file.Path;
-            intent.PutExtra(MediaStore.ExtraOutput, Android.Net.Uri.FromFile(file));
-            StartActivityForResult(intent, 0);
-        }
+        ///// <summary>
+        ///// TEST Front Facing Camera
+        ///// </summary>
+        //private void TakePicture()
+        //{
+        //    Intent intent = new Intent(MediaStore.ActionImageCapture);
+        //    var file = new Java.IO.File(CreateDirectoryForPictures(), string.Format("myPhoto.jpg", System.Guid.NewGuid()));
+        //    picturePath = file.Path;
+        //    intent.PutExtra(MediaStore.ExtraOutput, Android.Net.Uri.FromFile(file));
+        //    StartActivityForResult(intent, 0);
+        //}
                 
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
