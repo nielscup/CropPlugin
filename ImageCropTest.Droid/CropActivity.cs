@@ -15,18 +15,21 @@ namespace ImageCropTest.Droid
     [Activity(Label = "Crop View")]
     public class CropActivity : Activity
     {
-        const string imagePath = "/storage/emulated/0/Pictures/TempPictures/myPhoto.jpg";
+        string imagePath; //= "/storage/emulated/0/Pictures/TempPictures/myPhoto.jpg";
         Button buttonSave;
         CropImageView cropImageView;
         ImageView croppedImage;
+
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
 
+            imagePath = Intent.GetStringExtra("imagepath");
+
             // Create your application here
             SetContentView(Resource.Layout.CropView);
-            
+
             cropImageView = FindViewById<CropImageView>(Resource.Id.imageCropper);
             croppedImage = FindViewById<ImageView>(Resource.Id.croppedImage);
 
@@ -50,19 +53,24 @@ namespace ImageCropTest.Droid
         private void SetImage(int width, int height)
         {
             cropImageView.SetImage(imagePath, width, height);
+
+            // or you can use:
+            //cropImageView.ImagePath = imagePath;
+            //cropImageView.OutputWidth = width;
+            //cropImageView.OutputHeight = height;
+
             buttonSave.Visibility = ViewStates.Visible;
         }
 
         private void CropAndSaveImage()
         {
-            var croppedImagePath = imagePath.Replace(".", "-cropped."); 
-           
+            var croppedImagePath = imagePath.Replace(".", "-cropped.");
+
             cropImageView.CropAndSave(croppedImagePath);
 
             // Set ImageUri to null, otherwise it will not update if set to the same URI
             croppedImage.SetImageURI(null);
-
-            croppedImage.SetImageURI(Android.Net.Uri.Parse(croppedImagePath));            
+            croppedImage.SetImageURI(Android.Net.Uri.Parse(croppedImagePath));
         }
     }
 }

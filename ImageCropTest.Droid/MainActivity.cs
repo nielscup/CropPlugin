@@ -42,7 +42,7 @@ namespace ImageCropTest.Droid
             var shareButton = new Button(this) { Text = "Share" };
             mainLayout.AddView(shareButton);
 
-            var cropViewButton = new Button(this) { Text = "Crop View" };
+            var cropViewButton = new Button(this) { Text = "Start CropView.axml" };
             mainLayout.AddView(cropViewButton);
 
             var crop300x300Button1 = new Button(this) { Text = "Crop 300x300" };
@@ -56,10 +56,10 @@ namespace ImageCropTest.Droid
             buttonlayout1.AddView(crop300x200Button1);
             buttonlayout1.AddView(freeCropButton1);
 
-            var crop300x300Button2 = new Button(this) { Text = "Crop 300x300" };
-            var crop200x300Button2 = new Button(this) { Text = "Crop 200x300" };
-            var crop300x200Button2 = new Button(this) { Text = "Crop 300x200" };
-            var freeCropButton2 = new Button(this) { Text = "Crop" };
+            var crop300x300Button2 = new Button(this) { Text = "300x300" };
+            var crop200x300Button2 = new Button(this) { Text = "200x300" };
+            var crop300x200Button2 = new Button(this) { Text = "300x200" };
+            var freeCropButton2 = new Button(this) { Text = "Any" };
             
             var saveButton = new Button(this) { Text = "Save" };
 
@@ -73,8 +73,11 @@ namespace ImageCropTest.Droid
             buttonlayout2.AddView(freeCropButton2);            
             buttonlayout2.AddView(saveButton);
 
+            mainLayout.AddView(new TextView(this) { Text = "These buttons open the imagecropper intent" });
             mainLayout.AddView(buttonlayout1);
             mainLayout.AddView(imageView);
+
+            mainLayout.AddView(new TextView(this) { Text = "These buttons set the programatically added imagecropper" });
             mainLayout.AddView(buttonlayout2);
 
             // Create and add crop view
@@ -92,12 +95,22 @@ namespace ImageCropTest.Droid
             crop200x300Button2.Click += (s, e) => Crop(200, 300, false);
             crop300x200Button2.Click += (s, e) => Crop(300, 200, false);
             freeCropButton2.Click += (s, e) => Crop(0, 0, false);
-            
-            cropViewButton.Click += (s, e) => StartActivity(typeof(CropActivity));
+
+            cropViewButton.Click += cropViewButton_Click;
             saveButton.Click += saveButton_Click;
             shareButton.Click += shareButton_Click;
         }
 
+        void cropViewButton_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(picturePath))
+                return;
+
+            var cropActivity = new Intent(this, typeof(CropActivity));
+            cropActivity.PutExtra("imagepath", picturePath);
+            StartActivity(cropActivity);
+        }
+        
         void saveButton_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(croppedPicturePath))
@@ -142,6 +155,7 @@ namespace ImageCropTest.Droid
 
         private void SetPicture(string path)
         {
+            imageView.SetImageURI(null);
             imageView.SetImageURI(Android.Net.Uri.Parse(path));            
         }
                         
