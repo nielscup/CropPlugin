@@ -54,7 +54,14 @@ namespace Plugin.ImageCrop
 
                 //add geometry to graphics context and draw it
                 g.AddPath(_path);
-                g.DrawPath(CGPathDrawingMode.FillStroke);                
+                g.DrawPath(CGPathDrawingMode.FillStroke);
+
+                //// Draw overlay circle
+                //var pathStatus = new CGPath();
+                ////_frontColor.SetStroke();
+                //pathStatus.AddArc(rect.Size.Width / 2, rect.Size.Height / 2, rect.Size.Width / 2, 0, 360 * (float)Math.PI, false);
+                //g.AddPath(pathStatus);
+                //g.DrawPath(CGPathDrawingMode.Stroke);
             }
         }
     }

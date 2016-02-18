@@ -197,13 +197,8 @@ namespace Plugin.ImageCrop
             if (cropper == null)
             {
                 cropper = new CropperView(centerCropperLocation, size, cropperColor, cropperTransparency, cropperLineWidth);
-                
-                // enable Pinch
-                cropper.MultipleTouchEnabled = true;
-                var pinchRecognizer = new UIPinchGestureRecognizer(HandlePinchGesture);
-                HandlePinchGesture(pinchRecognizer);
-                cropper.AddGestureRecognizer(pinchRecognizer);
 
+                EnablePinch();
                 Add(cropper);
             }
             else
@@ -221,6 +216,14 @@ namespace Plugin.ImageCrop
             SetResizer();
             SetPreviewImage();
         }      
+
+        private void EnablePinch()
+        {
+            this.MultipleTouchEnabled = true;
+            var pinchRecognizer = new UIPinchGestureRecognizer(HandlePinchGesture);
+            HandlePinchGesture(pinchRecognizer);
+            this.AddGestureRecognizer(pinchRecognizer);
+        }
         
         private void SetCropperMinSize()
         {
