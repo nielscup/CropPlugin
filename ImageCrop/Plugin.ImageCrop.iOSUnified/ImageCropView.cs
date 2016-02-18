@@ -41,6 +41,7 @@ namespace Plugin.ImageCrop
         nfloat cropperHeight;
         nfloat cropperX;
         nfloat cropperY;
+        CGRect _frame;
         public event EventHandler OnSaved;
                 
         /// <summary>
@@ -155,6 +156,7 @@ namespace Plugin.ImageCrop
         {
             UserInteractionEnabled = true;
             this.Frame = frame;
+            _frame = frame;
         }
                 
         #endregion
@@ -170,8 +172,9 @@ namespace Plugin.ImageCrop
             }
 
             pic = new UIImage(ImagePath);
-            
-            var scaledPicture = ResizeImage(pic, (float)this.Frame.Size.Width, (float)this.Frame.Size.Height);
+
+            var scaledPicture = ResizeImage(pic, (float)_frame.Size.Width, (float)_frame.Size.Height);
+            marginX = (_frame.Size.Width - scaledPicture.Size.Width) / 2;
 
             this.Image = scaledPicture;
             this.Frame = new CGRect(marginX, marginY, (int)scaledPicture.Size.Width, (int)scaledPicture.Size.Height);
@@ -183,13 +186,13 @@ namespace Plugin.ImageCrop
         /// Sets the cropper
         /// </summary>
         private void SetCropper()
-        {
-            PointF centerCropperLocation = new PointF(
-                (float)(PictureX / 2 - cropperStartSize / 2),
-                (float)((PictureY / 2 - cropperStartSize / 2)));
-
-            var restrictedSize = RestrictCropperSize((nfloat)cropperStartSize, (nfloat)(cropperStartSize / cropperAspectRatio), centerCropperLocation.X, centerCropperLocation.Y);
+        {            
+            var restrictedSize = RestrictCropperSize((nfloat)cropperStartSize, (nfloat)(cropperStartSize / cropperAspectRatio), 0, 0);
             SizeF size = new SizeF((float)restrictedSize.Width, (float)restrictedSize.Height);
+
+            PointF centerCropperLocation = new PointF(
+                (float)(PictureX / 2 - restrictedSize.Width / 2),
+                (float)((PictureY / 2 - restrictedSize.Height / 2)));
 
             if (cropper == null)
             {

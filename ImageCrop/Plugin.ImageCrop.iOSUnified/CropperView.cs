@@ -32,6 +32,7 @@ namespace Plugin.ImageCrop
         internal void Reset(CGRect frame)
         {
             this.Frame = frame;
+            this.SetNeedsDisplay();
         }
                                 
         public override void Draw(CGRect rect)

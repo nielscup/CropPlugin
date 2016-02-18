@@ -12,7 +12,8 @@ namespace ImageCropTest.iOS
     public partial class CustomCropViewController : UIViewController
     {
         ImageCropView _imageCropView;
-        int yPos = 50;
+        int yPos = 30;
+        int xPos;
         const int defaultSize = 300;
         string _imagePath;
         string _croppedImagePath;
@@ -20,6 +21,7 @@ namespace ImageCropTest.iOS
         public CustomCropViewController(IntPtr handle) : base(handle) { }
         public CustomCropViewController(string imagePath)
         {
+            this.View.BackgroundColor = UIColor.White;
             _imagePath = imagePath;
             _croppedImagePath = imagePath.Replace(".", "-cropped.");
         }
@@ -34,24 +36,27 @@ namespace ImageCropTest.iOS
 
         void Initialize()
         {            
-            yPos = 0;
+            var buttonWidth = 85;
+            var cropButton300x300 = AddButton("300x300", buttonWidth);
+            cropButton300x300.TouchUpInside += (s, e) => SetCropper(300, 300);
 
+            var cropButton200x300 = AddButton("200x300", buttonWidth, true);
+            cropButton200x300.TouchUpInside += (s, e) => SetCropper(200, 300);
+
+            var cropButton300x200 = AddButton("200x300", buttonWidth, true);
+            cropButton300x200.TouchUpInside += (s, e) => SetCropper(300, 200);
+
+            var freeCropButton = AddButton("Any", buttonWidth, true);
+            freeCropButton.TouchUpInside += (s, e) => SetCropper(0, 0);
+
+            yPos += 20;
             var cropImageViewSize = Math.Min(UIScreen.MainScreen.Bounds.Size.Width, UIScreen.MainScreen.Bounds.Size.Height);
             _imageCropView = new ImageCropView(new CGRect(0, yPos, cropImageViewSize, cropImageViewSize));
             
             SetCropper(0, 0);
             yPos += (int)_imageCropView.Frame.Size.Height + (int)_imageCropView.Frame.Y;
             Add(_imageCropView);
-
-            var cropButton300x300 = AddButton("300x300");
-            cropButton300x300.TouchUpInside += (s,e) => SetCropper(300, 300);
-
-            var cropButton200x300 = AddButton("200x300");
-            cropButton200x300.TouchUpInside += (s, e) => SetCropper(200, 300);
-
-            var freeCropButton = AddButton("Any");
-            freeCropButton.TouchUpInside += (s, e) => SetCropper(0, 0);
-
+                        
             var saveButton = AddButton("Save");
             saveButton.TouchUpInside += SaveButton_TouchUpInside;
             
@@ -81,20 +86,30 @@ namespace ImageCropTest.iOS
                 
         #region ui controls
         
-        private UIButton AddButton(string title, int height = 40)
+        private UIButton AddButton(string title, int width = defaultSize, bool behindPreviousControl = false)
         {
-            var button = new UIButton(GetFrame(height));
+            var height = 40;
+            
+            if (behindPreviousControl)            
+                yPos -= height;            
+            else            
+                xPos = 30;    
+
+            var button = new UIButton(GetFrame(height, width, xPos));
             button.SetTitle(title, UIControlState.Normal);
             button.SetTitleColor(new UIColor(1, 0, 0, 1), UIControlState.Normal);
             Add(button);
 
+            xPos += width;
+            yPos += height;
+                        
             return button;
         }
 
-        private CGRect GetFrame(int height = 40, int width = defaultSize)
+        private CGRect GetFrame(int height, int width, int x)
         {
-            var rect = new CGRect(40, yPos, width, height);
-            yPos += height;
+            var rect = new CGRect(x, yPos, width, height);
+            
 
             return rect;
         }
