@@ -43,7 +43,7 @@ namespace ImageCropTest.iOS
             var cropButton200x300 = AddButton("200x300", buttonWidth, true);
             cropButton200x300.TouchUpInside += (s, e) => SetCropper(200, 300);
 
-            var cropButton300x200 = AddButton("300x300", buttonWidth, true);
+            var cropButton300x200 = AddButton("300x200", buttonWidth, true);
             cropButton300x200.TouchUpInside += (s, e) => SetCropper(300, 200);
 
             var anyCropButton = AddButton("Any", 40, true);
@@ -76,9 +76,9 @@ namespace ImageCropTest.iOS
             SetCropper(0, 0);
         }
                
-        void SetCropper(int width, int height, bool isRoundImage = false)
+        void SetCropper(int width, int height, bool isRound = false)
         {
-            _imageCropView.SetImage(_imagePath, width, height, isRoundImage);
+            _imageCropView.SetImage(_imagePath, width, height, isRound);
         }
                         
         public override void DidReceiveMemoryWarning()

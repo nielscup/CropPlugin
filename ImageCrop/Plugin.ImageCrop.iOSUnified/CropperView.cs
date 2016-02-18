@@ -14,25 +14,25 @@ namespace Plugin.ImageCrop
         private UIColor _color;
         private nfloat _transparancy;
         private nfloat _lineWidth;
-        bool _isRoundImage;
+        bool _isRound;
 
-        internal CropperView(PointF targetLocation, SizeF size, UIColor color, nfloat transparancy, nfloat lineWidth, bool isRoundImage)
+        internal CropperView(PointF targetLocation, SizeF size, UIColor color, nfloat transparancy, nfloat lineWidth, bool isRound)
         {
             _targetLocation = targetLocation;
             _size = size;
             _color = color ?? UIColor.White;
             _transparancy = transparancy == 0 ? 0.8f : transparancy;
             _lineWidth = lineWidth == 0 ? 3f : lineWidth;
-            _isRoundImage = isRoundImage;
+            _isRound = isRound;
             
             RectangleF frameRect = new RectangleF(_targetLocation.X, _targetLocation.Y, _size.Width, _size.Height);
             this.Frame = frameRect;
             this.BackgroundColor = UIColor.Clear;
         }
 
-        internal void Reset(CGRect frame, bool isRoundImage)
+        internal void Reset(CGRect frame, bool isRound)
         {
-            _isRoundImage = isRoundImage;
+            _isRound = isRound;
             this.Frame = frame;
             this.SetNeedsDisplay();
         }
@@ -46,7 +46,7 @@ namespace Plugin.ImageCrop
                 //set up drawing attributes
                 UIColor.Clear.SetFill();
 
-                if (_isRoundImage)
+                if (_isRound)
                 {
                     var circle = new CGPath();
                     var circleSize = rect.Size.Width / 2;

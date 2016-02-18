@@ -60,7 +60,7 @@ namespace Plugin.ImageCrop
         string _imagePath;
         int _outputWidth;
         int _outputHeight;
-        bool _isRoundImage;
+        bool _isRound;
         
         /// <summary>
         /// The local path to the image to be cropped, fi: "/storage/emulated/0/Pictures/TempPictures/myPhoto-cropped.jpg"
@@ -120,20 +120,20 @@ namespace Plugin.ImageCrop
         }
 
         /// <summary>
-        /// Determines wether the cropper is round. A round cropped round image will be saved as a square image, therefor the OuputHeight will be ignored when set to true.
+        /// Determines wether the cropper is round. A round cropped image will be saved as a square image, therefor the OuputHeight will be ignored when set to true.
         /// </summary>
-        public bool IsRoundImage
+        public bool IsRound
         {
             get
             {
-                return _isRoundImage;
+                return _isRound;
             }
             set
             {
-                if (_isRoundImage == value)
+                if (_isRound == value)
                     return;
 
-                _isRoundImage = value;
+                _isRound = value;
                 SetCropper();
             }
         }
@@ -144,14 +144,14 @@ namespace Plugin.ImageCrop
         /// <param name="imagePath">the image path, fi: "/storage/emulated/0/Pictures/TempPictures/myPhoto.jpg"</param>
         /// <param name="outputWidth">The width after cropping, leave empty or set to 0 for any width</param>
         /// <param name="outputHeight">The height after cropping, leave empty or set to 0 for any height</param>
-        /// <param name="isRoundImage">Determines wether the cropper is round. A round cropped round image will be saved as a square image, therefor the OuputHeight will be ignored when set to true.</param>
-        public void SetImage(string imagePath, int outputWidth = 0, int outputHeight = 0, bool isRoundImage = false)
+        /// <param name="isRound">Determines wether the cropper is round. A round cropped image will be saved as a square image, therefor the OuputHeight will be ignored when set to true.</param>
+        public void SetImage(string imagePath, int outputWidth = 0, int outputHeight = 0, bool isRound = false)
         {
-            IsRoundImage = isRoundImage;
+            IsRound = isRound;
             OutputWidth = outputWidth;
             OutputHeight = outputHeight;
 
-            if (isRoundImage)
+            if (isRound)
                 OutputHeight = outputWidth;
 
             ImagePath = imagePath;

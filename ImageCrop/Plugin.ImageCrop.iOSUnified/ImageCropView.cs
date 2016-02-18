@@ -6,6 +6,7 @@ using UIKit;
 using CoreGraphics;
 using Foundation;
 using System.Drawing;
+using CoreAnimation;
 
 namespace Plugin.ImageCrop
 {
@@ -53,7 +54,7 @@ namespace Plugin.ImageCrop
         string _imagePath;
         int _outputWidth;
         int _outputHeight;
-        bool _isRoundImage;
+        bool _isRound;
                                 
         /// <summary>
         /// The local path to the image to be cropped, fi: "/storage/emulated/0/Pictures/TempPictures/myPhoto-cropped.jpg"
@@ -115,18 +116,18 @@ namespace Plugin.ImageCrop
         /// <summary>
         /// Determines wether the cropper is round. A round cropped round image will be saved as a square image, therefor the OuputHeight will be ignored when set to true.
         /// </summary>
-        public bool IsRoundImage
+        public bool IsRound
         {
             get
             {
-                return _isRoundImage;
+                return _isRound;
             }
             set
             {
-                if (_isRoundImage == value)
+                if (_isRound == value)
                     return;
 
-                _isRoundImage = value;
+                _isRound = value;
                 Initialize();
             }
         }
@@ -137,14 +138,14 @@ namespace Plugin.ImageCrop
         /// <param name="imagePath">the image path, fi: "/storage/emulated/0/Pictures/TempPictures/myPhoto.jpg"</param>
         /// <param name="outputWidth">The width after cropping, leave empty or set to 0 for any width</param>
         /// <param name="outputHeight">The height after cropping, leave empty or set to 0 for any height</param>
-        /// <param name="isRoundImage">Determines wether the cropper is round. A round cropped round image will be saved as a square image, therefor the OuputHeight will be ignored when set to true.</param>
-        public void SetImage(string imagePath, int outputWidth = 0, int outputHeight = 0, bool isRoundImage = false)
+        /// <param name="isRound">Determines wether the cropper is round. A round cropped image will be saved as a square image, therefor the OuputHeight will be ignored when set to true.</param>
+        public void SetImage(string imagePath, int outputWidth = 0, int outputHeight = 0, bool isRound = false)
         {
-            IsRoundImage = isRoundImage;
+            IsRound = isRound;
             OutputWidth = outputWidth;
             OutputHeight = outputHeight;
             
-            if (isRoundImage)
+            if (isRound)
                 OutputHeight = outputWidth;
 
             ImagePath = imagePath;            
@@ -218,14 +219,14 @@ namespace Plugin.ImageCrop
 
             if (cropper == null)
             {
-                cropper = new CropperView(centerCropperLocation, size, cropperColor, cropperTransparency, cropperLineWidth, IsRoundImage);
+                cropper = new CropperView(centerCropperLocation, size, cropperColor, cropperTransparency, cropperLineWidth, IsRound);
 
                 EnablePinch();
                 Add(cropper);
             }
             else
             {
-                cropper.Reset(new RectangleF(centerCropperLocation.X, centerCropperLocation.Y, size.Width, size.Height), IsRoundImage);
+                cropper.Reset(new RectangleF(centerCropperLocation.X, centerCropperLocation.Y, size.Width, size.Height), IsRound);
             }
 
             if (resizer == null)
@@ -276,15 +277,29 @@ namespace Plugin.ImageCrop
                 width = previewImageSize * (nfloat)cropperAspectRatio;
             }
 
-            previewImage.Frame = new CGRect(10, 10 + PictureY - height, width, height);
+            previewImage.Frame = new CGRect(10, 20 + PictureY - height, width, height);
 
             previewImage.Image = CropImage(pic,
-                //(float)(cropper.Frame.X / maxResizeFactor - marginX / maxResizeFactor),
-                //(float)(cropper.Frame.Y / maxResizeFactor - marginY / maxResizeFactor),
                 (float)(cropper.Frame.X / maxResizeFactor),
                 (float)(cropper.Frame.Y / maxResizeFactor), 
                 (float)(cropper.Frame.Width / maxResizeFactor),
-                (float)(cropper.Frame.Height / maxResizeFactor));           
+                (float)(cropper.Frame.Height / maxResizeFactor));
+
+            previewImage.Layer.BorderColor = UIColor.White.CGColor;
+            previewImage.Layer.BorderWidth = 3;
+
+            CALayer profileImageCircle = previewImage.Layer;            
+            profileImageCircle.MasksToBounds = true;  
+
+            if (IsRound)
+            {
+                // make previewImage round                
+                profileImageCircle.CornerRadius = previewImage.Frame.Size.Width / 2;  
+            }
+            else
+            {
+                profileImageCircle.CornerRadius = 0;
+            }
         }
 
         /// <summary>

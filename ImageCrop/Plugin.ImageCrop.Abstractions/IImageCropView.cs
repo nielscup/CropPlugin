@@ -24,9 +24,9 @@ namespace Plugin.ImageCrop.Abstractions
         int OutputHeight { get; set; }
 
         /// <summary>
-        /// Determines wether the cropper is round. A round cropped round image will be saved as a square image, therefor the OuputHeight will be ignored when set to true.
+        /// Determines wether the cropper is round. A round cropped image will be saved as a square image, therefor the OuputHeight will be ignored when set to true.
         /// </summary>
-        bool IsRoundImage { get; set; }
+        bool IsRound { get; set; }
 
         /// <summary>
         /// Sets the image to be cropped
@@ -34,8 +34,8 @@ namespace Plugin.ImageCrop.Abstractions
         /// <param name="imagePath">the image path, fi: "/storage/emulated/0/Pictures/TempPictures/myPhoto.jpg"</param>
         /// <param name="outputWidth">The width after cropping, leave empty or set to 0 for any width</param>
         /// <param name="outputHeight">The height after cropping, leave empty or set to 0 for any height</param>
-        /// <param name="isRoundImage">Determines wether the cropper is round. A round cropped round image will be saved as a square image, therefor the OuputHeight will be ignored when set to true.</param>
-        void SetImage(string imagePath, int outputWidth = 0, int outputHeight = 0, bool isRoundImage = false);
+        /// <param name="isRound">Determines wether the cropper is round. A round cropped image will be saved as a square image, therefor the OuputHeight will be ignored when set to true.</param>
+        void SetImage(string imagePath, int outputWidth = 0, int outputHeight = 0, bool isRound = false);
 
         /// <summary>
         /// Saves the cropped image
