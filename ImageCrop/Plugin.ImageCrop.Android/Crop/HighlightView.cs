@@ -22,12 +22,12 @@ using System;
 
 namespace Plugin.ImageCrop
 {
-    public class HighlightView
+    internal class HighlightView
     {
         // The View displaying the image.
         private View context;
 
-        public enum ModifyMode
+        internal enum ModifyMode
         {
             None,
             Move,
@@ -38,7 +38,7 @@ namespace Plugin.ImageCrop
 
         private RectF imageRect;  // in image space
         RectF cropRect;  // in image space
-        public Matrix matrix;
+        internal Matrix matrix;
 
         private bool maintainAspectRatio = false;
         private float initialAspectRatio;
@@ -49,7 +49,7 @@ namespace Plugin.ImageCrop
         private Paint outlinePaint = new Paint();
 
         [Flags]
-        public enum HitPosition
+        internal enum HitPosition
         {
             None,
             GrowLeftEdge,
@@ -61,7 +61,7 @@ namespace Plugin.ImageCrop
 
         #region Constructor
 
-        public HighlightView(View ctx)
+        internal HighlightView(View ctx)
         {
             context = ctx;
         }
@@ -70,26 +70,26 @@ namespace Plugin.ImageCrop
 
         #region Properties
 
-        public bool Focused
+        internal bool Focused
         {
             get;
             set;
         }
 
-        public bool Hidden
+        internal bool Hidden
         {
             get;
             set;
         }
 
-        public Rect DrawRect  // in screen space
+        internal Rect DrawRect  // in screen space
         {
             get;
             private set;
         }
 
         // Returns the cropping rectangle in image space.
-        public Rect CropRect
+        internal Rect CropRect
         {
             get
             {
@@ -98,7 +98,7 @@ namespace Plugin.ImageCrop
             }
         }
 
-        public ModifyMode Mode
+        internal ModifyMode Mode
         {
             get
             {
@@ -120,7 +120,7 @@ namespace Plugin.ImageCrop
 
         // Handles motion (dx, dy) in screen space.
         // The "edge" parameter specifies which edges the user is dragging.
-        public void HandleMotion(HitPosition edge, float dx, float dy)
+        internal void HandleMotion(HitPosition edge, float dx, float dy)
         {
             Rect r = computeLayout();
             if (edge == HitPosition.None)
@@ -154,7 +154,7 @@ namespace Plugin.ImageCrop
             }
         }
 
-        public void Draw(Canvas canvas)
+        internal void Draw(Canvas canvas)
         {
             if (Hidden)
             {
@@ -201,7 +201,7 @@ namespace Plugin.ImageCrop
         }
 
         // Determines which edges are hit by touching at (x, y).
-        public HitPosition GetHit(float x, float y)
+        internal HitPosition GetHit(float x, float y)
         {
             Rect r = computeLayout();
             float hysteresis = 20F;
@@ -227,12 +227,12 @@ namespace Plugin.ImageCrop
             return retval;
         }
 
-        public void Invalidate()
+        internal void Invalidate()
         {
             DrawRect = computeLayout();
         }
 
-        public void Setup(Matrix m, Rect imageRect, RectF cropRect, bool maintainAspectRatio)
+        internal void Setup(Matrix m, Rect imageRect, RectF cropRect, bool maintainAspectRatio)
         {
             matrix = new Matrix(m);
 

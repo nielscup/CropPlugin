@@ -7,7 +7,7 @@ using UIKit;
 
 namespace Plugin.ImageCrop
 {
-    public class CropperView : UIView
+    internal class CropperView : UIView
     {
         private CGPath _path;
         private PointF _targetLocation;
@@ -16,7 +16,7 @@ namespace Plugin.ImageCrop
         private nfloat _transparancy;
         private nfloat _lineWidth;
 
-        public CropperView(PointF targetLocation, SizeF size, UIColor color = null, nfloat transparancy = default(nfloat), nfloat lineWidth = default(nfloat))
+        internal CropperView(PointF targetLocation, SizeF size, UIColor color = null, nfloat transparancy = default(nfloat), nfloat lineWidth = default(nfloat))
         {
             _targetLocation = targetLocation;
             _size = size;
@@ -29,6 +29,11 @@ namespace Plugin.ImageCrop
             this.BackgroundColor = UIColor.Clear;
         }
 
+        internal void Reset(CGRect frame)
+        {
+            this.Frame = frame;
+        }
+                                
         public override void Draw(CGRect rect)
         {
             //get graphics context

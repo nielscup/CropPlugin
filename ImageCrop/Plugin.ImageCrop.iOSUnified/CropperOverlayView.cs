@@ -7,26 +7,23 @@ using UIKit;
 
 namespace Plugin.ImageCrop
 {
-    public class CropperOverlayView : UIView
+    internal class CropperOverlayView : UIView
     {
         private CGPath _overlay;
         private float _width;
         private float _height;
-        private float _x;
-        private float _y;
         private CGRect _rect;
 
-        public CropperOverlayView(CGRect rect, float width, float height)
+        internal CropperOverlayView(CGRect rect, float width, float height)
         {
             _rect = rect;
             _width = width;
             _height = height;
             this.Frame = new RectangleF(0, 0, width, height);
-            //DrawOverlay(rect, width, height);
             this.BackgroundColor = UIColor.Clear;
         }
 
-        public void Redraw(CGRect rect)
+        internal void Redraw(CGRect rect)
         {
             _rect = rect;
         }

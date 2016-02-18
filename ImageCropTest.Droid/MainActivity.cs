@@ -17,7 +17,7 @@ namespace ImageCropTest.Droid
         string picturePath;
         string croppedPicturePath;
         ImageView imageView;
-        CropImageView cropImageView;
+        ImageCropView imageCropView;
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
@@ -42,8 +42,8 @@ namespace ImageCropTest.Droid
             var shareButton = new Button(this) { Text = "Share" };
             mainLayout.AddView(shareButton);
 
-            var cropViewButton = new Button(this) { Text = "Start CropView.axml" };
-            mainLayout.AddView(cropViewButton);
+            var customCropViewButton = new Button(this) { Text = "Custom Crop View" };
+            mainLayout.AddView(customCropViewButton);
 
             var crop300x300Button1 = new Button(this) { Text = "Crop 300x300" };
             var crop200x300Button1 = new Button(this) { Text = "Crop 200x300" };
@@ -81,8 +81,8 @@ namespace ImageCropTest.Droid
             mainLayout.AddView(buttonlayout2);
 
             // Create and add crop view
-            cropImageView = new CropImageView(this, null);           
-            mainLayout.AddView(cropImageView);            
+            imageCropView = new ImageCropView(this, null);           
+            mainLayout.AddView(imageCropView);            
 
             takePictureButton.Click += takePictureButton_Click;
 
@@ -96,19 +96,19 @@ namespace ImageCropTest.Droid
             crop300x200Button2.Click += (s, e) => Crop(300, 200, false);
             freeCropButton2.Click += (s, e) => Crop(0, 0, false);
 
-            cropViewButton.Click += cropViewButton_Click;
+            customCropViewButton.Click += customCropViewButton_Click;
             saveButton.Click += saveButton_Click;
             shareButton.Click += shareButton_Click;
         }
 
-        void cropViewButton_Click(object sender, EventArgs e)
+        void customCropViewButton_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(picturePath))
                 return;
 
-            var cropActivity = new Intent(this, typeof(CropActivity));
-            cropActivity.PutExtra("imagepath", picturePath);
-            StartActivity(cropActivity);
+            var customCropActivity = new Intent(this, typeof(CustomCropActivity));
+            customCropActivity.PutExtra("imagepath", picturePath);
+            StartActivity(customCropActivity);
         }
         
         void saveButton_Click(object sender, EventArgs e)
@@ -116,7 +116,7 @@ namespace ImageCropTest.Droid
             if (string.IsNullOrWhiteSpace(croppedPicturePath))
                 return;
             
-            cropImageView.CropAndSave(croppedPicturePath);
+            imageCropView.CropAndSave(croppedPicturePath);
             SetPicture(croppedPicturePath);
         }
 
@@ -150,7 +150,7 @@ namespace ImageCropTest.Droid
             if (useExternalCropper)
                 CrossImageCrop.Current.CropImage(picturePath, croppedPicturePath, () => SetPicture(croppedPicturePath), width, height);
             else            
-                cropImageView.SetImage(picturePath, width, height);
+                imageCropView.SetImage(picturePath, width, height);
         }
 
         private void SetPicture(string path)

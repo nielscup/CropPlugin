@@ -6,13 +6,13 @@ using UIKit;
 
 namespace Plugin.ImageCrop
 {
-    public class CropperResizerView : UIView
+    internal class CropperResizerView : UIView
     {
         private UIColor _color;
         private nfloat _transparancy;
         private nfloat _lineWidth;
 
-        public CropperResizerView(UIColor color = null, nfloat transparancy = default(nfloat), nfloat lineWidth = default(nfloat))
+        internal CropperResizerView(UIColor color = null, nfloat transparancy = default(nfloat), nfloat lineWidth = default(nfloat))
         {
             this.BackgroundColor = UIColor.Clear;
             _color = color ?? UIColor.Red;

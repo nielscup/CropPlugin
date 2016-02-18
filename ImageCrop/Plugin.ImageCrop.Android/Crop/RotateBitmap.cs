@@ -104,7 +104,5 @@ namespace Plugin.ImageCrop
                 }
             }
         }
-
-        // TOOD: Recyle
     }
 }

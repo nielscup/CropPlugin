@@ -19,13 +19,13 @@ using System;
 
 namespace Plugin.ImageCrop
 {
-    public class MonitoredActivity : Activity
+    internal class MonitoredActivity : Activity
     {
         #region IMonitoredActivity implementation
 
-        public event EventHandler Destroying;
-        public event EventHandler Stopping;
-        public event EventHandler Starting;
+        internal event EventHandler Destroying;
+        internal event EventHandler Stopping;
+        internal event EventHandler Starting;
 
         #endregion
 

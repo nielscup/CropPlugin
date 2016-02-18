@@ -38,6 +38,7 @@
     <Compile Include="..\Plugin.ImageCrop\CrossImageCrop.cs">
       <Link>CrossImageCrop.cs</Link>
     </Compile>
+    <Compile Include="ImageCropView.cs" />
     <Compile Include="CropImageViewController.cs" />
     <Compile Include="CropperResizerView.cs" />
     <Compile Include="CropperOverlayView.cs" />

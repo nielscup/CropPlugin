@@ -23,11 +23,12 @@ using System.Collections.Generic;
 using Android.Runtime;
 using Android.OS;
 using Android.Widget;
+using Plugin.ImageCrop.Abstractions;
 
 namespace Plugin.ImageCrop
 {
-    [Register("plugin.imagecrop.android.CropImageView")]
-    public class CropImageView : ImageViewTouchBase
+    [Register("plugin.imagecrop.android.ImageCropView")]
+    public class ImageCropView : ImageViewTouchBase, IImageCropView
     {
         List<HighlightView> hightlightViews = new List<HighlightView>();
         HighlightView mMotionHighlightView = null;
@@ -38,22 +39,44 @@ namespace Plugin.ImageCrop
         bool saving;
         Bitmap.CompressFormat outputFormat = Bitmap.CompressFormat.Jpeg;
         HighlightView highlightView;
-        Bitmap bitmap;
-        string _imagePath;
-        int _outputWidth;
-        int _outputHeight;
+        Bitmap bitmap;        
         
         bool scale = true;
         bool scaleUp = true;
         Handler mHandler = new Handler();
                 
-        public CropImageView(Context context, IAttributeSet attrs)
+        public ImageCropView(Context context, IAttributeSet attrs)
             : base(context, attrs)
         {
             SetLayerType(Android.Views.LayerType.Software, null);
             this.context = context;
         }
-                
+
+        #region interface implementation
+
+        string _imagePath;
+        int _outputWidth;
+        int _outputHeight;
+
+        /// <summary>
+        /// The local path to the image to be cropped, fi: "/storage/emulated/0/Pictures/TempPictures/myPhoto-cropped.jpg"
+        /// </summary>
+        public string ImagePath
+        {
+            get
+            {
+                return _imagePath;
+            }
+            set
+            {
+                if (_imagePath == value)
+                    return;
+
+                _imagePath = value;
+                SetCropper();
+            }
+        }  
+
         /// <summary>
         /// The width after cropping, set to 0 for any width or height
         /// </summary>        
@@ -91,37 +114,6 @@ namespace Plugin.ImageCrop
                 SetCropper();
             }
         }
-                
-        /// <summary>
-        /// The local path to the image to be cropped, fi: "/storage/emulated/0/Pictures/TempPictures/myPhoto-cropped.jpg"
-        /// </summary>
-        public string ImagePath 
-        {
-            get
-            {
-                return _imagePath;
-            }
-            set
-            {
-                if(_imagePath == value)
-                    return;
-
-                _imagePath = value;
-                SetCropper();
-            }
-        }  
-
-        private void SetCropper()
-        {
-            if (string.IsNullOrWhiteSpace(ImagePath))
-                return;
-
-            bitmap = Util.GetBitmap(_imagePath, context.ContentResolver);
-            SetImageBitmapResetBase(bitmap, true);
-            AddHighlightView(bitmap);
-        }
-  
-        #region Public methods
 
         /// <summary>
         /// Sets the image to be cropped
@@ -141,16 +133,30 @@ namespace Plugin.ImageCrop
         /// </summary>
         /// <param name="destinationPath">the image destination path after cropping, fi: "/storage/emulated/0/Pictures/TempPictures/myPhoto-cropped.jpg"</param>
         public void CropAndSave(string destinationPath)
-        { 
+        {
             var saveUri = Util.GetImageUri(destinationPath);
             CropAndSave(saveUri);
         }
 
+        #endregion
+
+        private void SetCropper()
+        {
+            if (string.IsNullOrWhiteSpace(ImagePath))
+                return;
+
+            bitmap = Util.GetBitmap(_imagePath, context.ContentResolver);
+            SetImageBitmapResetBase(bitmap, true);
+            AddHighlightView(bitmap);
+        }
+  
+        #region Public methods
+                                
         /// <summary>
         /// Saves the cropped image
         /// </summary>
         /// <param name="destinationUri">the image destination uri after cropping</param>
-        public void CropAndSave(Android.Net.Uri destinationUri)
+        private void CropAndSave(Android.Net.Uri destinationUri)
         {
             var bmp = Crop();
             SaveOutput(bmp, destinationUri);
@@ -159,7 +165,7 @@ namespace Plugin.ImageCrop
         /// <summary>
         /// Crops the image
         /// </summary>
-        public Bitmap Crop()
+        internal Bitmap Crop()
         {
             try
             {
@@ -248,7 +254,7 @@ namespace Plugin.ImageCrop
         /// </summary>
         /// <param name="croppedImage">the cropped image</param>
         /// <param name="saveUri"> the uri to save the cropped image to</param>
-        public void SaveOutput(Bitmap croppedImage, Android.Net.Uri saveUri)
+        internal void SaveOutput(Bitmap croppedImage, Android.Net.Uri saveUri)
         {
             if (saveUri == null)
             {

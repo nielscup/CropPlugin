@@ -12,14 +12,13 @@ using Plugin.ImageCrop;
 
 namespace ImageCropTest.Droid
 {
-    [Activity(Label = "Crop View")]
-    public class CropActivity : Activity
+    [Activity(Label = "Custom Crop View")]
+    public class CustomCropActivity : Activity
     {
-        string imagePath; //= "/storage/emulated/0/Pictures/TempPictures/myPhoto.jpg";
+        string imagePath;
         Button buttonSave;
-        CropImageView cropImageView;
+        ImageCropView imageCropView;
         ImageView croppedImage;
-
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -28,9 +27,9 @@ namespace ImageCropTest.Droid
             imagePath = Intent.GetStringExtra("imagepath");
 
             // Create your application here
-            SetContentView(Resource.Layout.CropView);
+            SetContentView(Resource.Layout.CustomCropView);
 
-            cropImageView = FindViewById<CropImageView>(Resource.Id.imageCropper);
+            imageCropView = FindViewById<ImageCropView>(Resource.Id.imageCropper);
             croppedImage = FindViewById<ImageView>(Resource.Id.croppedImage);
 
             var button300x300 = FindViewById<Button>(Resource.Id.button300x300);
@@ -52,7 +51,7 @@ namespace ImageCropTest.Droid
 
         private void SetImage(int width, int height)
         {
-            cropImageView.SetImage(imagePath, width, height);
+            imageCropView.SetImage(imagePath, width, height);
 
             // or you can use:
             //cropImageView.ImagePath = imagePath;
@@ -66,7 +65,7 @@ namespace ImageCropTest.Droid
         {
             var croppedImagePath = imagePath.Replace(".", "-cropped.");
 
-            cropImageView.CropAndSave(croppedImagePath);
+            imageCropView.CropAndSave(croppedImagePath);
 
             // Set ImageUri to null, otherwise it will not update if set to the same URI
             croppedImage.SetImageURI(null);

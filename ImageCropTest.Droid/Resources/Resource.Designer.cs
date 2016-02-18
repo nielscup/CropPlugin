@@ -95,7 +95,7 @@ namespace ImageCropTest.Droid
 		{
 			
 			// aapt resource value: 0x7f030000
-			public const int CropView = 2130903040;
+			public const int CustomCropView = 2130903040;
 			
 			static Layout()
 			{

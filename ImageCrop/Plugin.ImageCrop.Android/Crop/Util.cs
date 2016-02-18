@@ -21,11 +21,11 @@ using System;
 
 namespace Plugin.ImageCrop
 {
-    public class Util
+    internal class Util
     {
         // Rotates the bitmap by the specified degree.
         // If a new bitmap is created, the original bitmap is recycled.
-        public static Bitmap rotateImage(Bitmap b, int degrees)
+        internal static Bitmap rotateImage(Bitmap b, int degrees)
         {
             if (degrees != 0 && b != null)
             {
@@ -51,7 +51,7 @@ namespace Plugin.ImageCrop
             return b;
         }
 
-        public static Bitmap transform(Matrix scaler,
+        internal static Bitmap transform(Matrix scaler,
                                        Bitmap source,
                                        int targetWidth,
                                        int targetHeight,
@@ -155,7 +155,7 @@ namespace Plugin.ImageCrop
             return b3;
         }
 
-        public static Bitmap GetBitmap(String path, ContentResolver contentResolver)
+        internal static Bitmap GetBitmap(String path, ContentResolver contentResolver)
         {
             var uri = GetImageUri(path);
             System.IO.Stream ins = null;
@@ -195,7 +195,7 @@ namespace Plugin.ImageCrop
             return null;
         }
 
-        public static Android.Net.Uri GetImageUri(String path)
+        internal static Android.Net.Uri GetImageUri(String path)
         {
             return Android.Net.Uri.FromFile(new Java.IO.File(path));
         }

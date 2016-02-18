@@ -31,7 +31,7 @@ namespace Plugin.ImageCrop
             Poco.CroppedImageWidth = croppedImageWidth;
             Poco.CroppedImageHeight = croppedImageHeight;
 
-            var intent = new Intent(Android.App.Application.Context, typeof(CropImageLauncher));
+            var intent = new Intent(Android.App.Application.Context, typeof(ImageCropActivityLauncher));
             intent.SetFlags(ActivityFlags.ClearTop);
             intent.SetFlags(ActivityFlags.NewTask);
 

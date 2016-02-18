@@ -16,7 +16,7 @@ namespace Plugin.ImageCrop.Crop
     /// Activity to launch the CropImage Activity and respond to its result
     /// </summary>
     [Activity]
-    public class CropImageLauncher: Activity
+    internal class ImageCropActivityLauncher : Activity
     {
         Action _callback;
 
@@ -26,13 +26,13 @@ namespace Plugin.ImageCrop.Crop
             CropImage(Poco.ImagePath, Poco.CroppedImagePath, Poco.CallBack);
         }
 
-        public void CropImage(string imagePath, string croppedImagePath, Action callback)
+        internal void CropImage(string imagePath, string croppedImagePath, Action callback)
         {
             var pictureUri = Android.Net.Uri.Parse(imagePath);
             var croppedPictureUri = Android.Net.Uri.Parse(croppedImagePath);
             _callback = callback;
 
-            Intent cropIntent = new Intent(this, typeof(CropImage));
+            Intent cropIntent = new Intent(this, typeof(ImageCropActivity));
             cropIntent.PutExtra("image-path", pictureUri.Path);
             cropIntent.PutExtra("cropped-image-path", croppedPictureUri.Path);
             SetCropVariables(ref cropIntent);

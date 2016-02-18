@@ -14,8 +14,8 @@ namespace ImageCropTest.iOS
         UIImageView _picture;
         int yPos = 50;
         const int defaultSize = 300;
-        string picturePath;
-        string croppedPicturePath;
+        string _imagePath;
+        string croppedImagePath;
         UIButton authenticateButton;
 
         public ViewController(IntPtr handle) : base(handle) { }
@@ -24,16 +24,20 @@ namespace ImageCropTest.iOS
         {
             base.ViewDidLoad();
             // Perform any additional setup after loading the view, typically from a nib.
-            
-            yPos = 220;
-            authenticateButton = AddButton("Authenticate");
-            authenticateButton.TouchUpInside += authenticateButton_TouchUpInside;                               
+
+            //SetAuthentication();
+            Initialize();             
         }
 
-        void Init()
+        void SetAuthentication()
         {
-            authenticateButton.Hidden = true;
+            yPos = 220;
+            authenticateButton = AddButton("Authenticate");
+            authenticateButton.TouchUpInside += (s, e) => AuthenticateMe(); 
+        }
 
+        void Initialize()
+        {            
             yPos = 50;
             var takePictureButton = AddButton("Take Picture");
             takePictureButton.TouchUpInside += takePictureButton_TouchUpInside;
@@ -44,38 +48,29 @@ namespace ImageCropTest.iOS
             _picture = AddImage(300, 300);
 
             var cropButton300x300 = AddButton("Crop 300x300");
-            cropButton300x300.TouchUpInside += cropButton300x300_TouchUpInside;
+            cropButton300x300.TouchUpInside += (s, e) => Crop(300, 300);
 
             var cropButton200x300 = AddButton("Crop 200x300");
-            cropButton200x300.TouchUpInside += cropButton200x300_TouchUpInside;
+            cropButton200x300.TouchUpInside += (s, e) => Crop(200, 300);
 
             var freeCropButton = AddButton("Crop");
-            freeCropButton.TouchUpInside += freeCropButton_TouchUpInside;
+            freeCropButton.TouchUpInside += (s, e) => Crop(0, 0);
 
             var shareButton = AddButton("Share Picture");
-            shareButton.TouchUpInside += shareButton_TouchUpInside;     
+            shareButton.TouchUpInside += shareButton_TouchUpInside;
+
+            var cropViewButton = AddButton("Custom Crop View");
+            cropViewButton.TouchUpInside += cropViewButton_TouchUpInside;
         }
 
-        void authenticateButton_TouchUpInside(object sender, EventArgs e)
+        void cropViewButton_TouchUpInside(object sender, EventArgs e)
         {
-            AuthenticateMe();
-        }
+            if (string.IsNullOrWhiteSpace(_imagePath))
+                return;
 
-        void cropButton300x300_TouchUpInside(object sender, EventArgs e)
-        {
-            Crop(300, 300);
+            PresentViewController(new CustomCropViewController(_imagePath), true, null);
         }
-
-        void cropButton200x300_TouchUpInside(object sender, EventArgs e)
-        {
-            Crop(200, 300);
-        }
-
-        void freeCropButton_TouchUpInside(object sender, EventArgs e)
-        {
-            Crop(0, 0);
-        }
-
+                
         void takePictureButton_TouchUpInside(object sender, EventArgs e)
         {            
             CameraHelper.TakePicture(this, (obj) => SaveImage(obj));
@@ -88,34 +83,36 @@ namespace ImageCropTest.iOS
 
         async void shareButton_TouchUpInside(object sender, EventArgs e)
         {
-            await CrossShare.Current.ShareLocalFile(croppedPicturePath);
+            if (string.IsNullOrWhiteSpace(croppedImagePath))
+                return;
+
+            await CrossShare.Current.ShareLocalFile(croppedImagePath);
         }
 
         void SaveImage(NSDictionary obj)
         {
             var picture = obj.ValueForKey(new NSString("UIImagePickerControllerOriginalImage")) as UIImage;
             var documentsDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-            picturePath = System.IO.Path.Combine(documentsDirectory, "picture.jpg"); // hardcoded filename, overwritten each time
-            croppedPicturePath = System.IO.Path.Combine(documentsDirectory, "picture-cropped.jpg");
+            _imagePath = System.IO.Path.Combine(documentsDirectory, "picture.jpg"); // hardcoded filename, overwritten each time
+            croppedImagePath = System.IO.Path.Combine(documentsDirectory, "picture-cropped.jpg");
             NSData imgData = picture.AsJPEG();
             NSError err = null;
-            if (imgData.Save(picturePath, false, out err))
+            if (imgData.Save(_imagePath, false, out err))
             {
-                SetPicture(picturePath);
-
-                // Crop
-                //CrossImageCrop.Current.CropImage(picturePath, croppedPicturePath, () => SetPicture(croppedPicturePath));
-                //CrossImageCrop.Current.CropImage(picturePath, croppedPicturePath, () => SetPicture(croppedPicturePath), 300, 300);
+                SetPicture(_imagePath);
             }
             else
             {
-                Console.WriteLine("NOT saved as " + croppedPicturePath + " because" + err.LocalizedDescription);
+                Console.WriteLine("NOT saved as " + croppedImagePath + " because" + err.LocalizedDescription);
             }
         }
 
         void Crop(int croppedImageWidth, int croppedImageHeight)
         {
-            CrossImageCrop.Current.CropImage(picturePath, croppedPicturePath, () => SetPicture(croppedPicturePath), croppedImageWidth, croppedImageHeight);
+            if (string.IsNullOrWhiteSpace(_imagePath))
+                return;
+
+            CrossImageCrop.Current.CropImage(_imagePath, croppedImagePath, () => SetPicture(croppedImagePath), croppedImageWidth, croppedImageHeight);
         }
                                 
         void SetPicture(string path)
@@ -138,6 +135,9 @@ namespace ImageCropTest.iOS
             // Release any cached data, images, etc that aren't in use.
         }
 
+        /// <summary>
+        /// TouchId authentication test
+        /// </summary>
         private void AuthenticateMe()
         {
             var context = new LAContext();
@@ -153,7 +153,8 @@ namespace ImageCropTest.iOS
                         if (success)
                         {
                             Console.WriteLine("You logged in!");
-                            Init();
+                            authenticateButton.Hidden = true;
+                            Initialize();
                         }
                         else
                         {

@@ -15,12 +15,12 @@ namespace Plugin.ImageCrop
     /// <summary>
     /// Simple object for storing and passing image parameters
     /// </summary>
-    public static class Poco
+    internal static class Poco
     {
-        public static string ImagePath { get; set; }
-        public static string CroppedImagePath { get; set; }
-        public static Action CallBack { get; set; }
-        public static int CroppedImageWidth { get; set; }
-        public static int CroppedImageHeight { get; set; }
+        internal static string ImagePath { get; set; }
+        internal static string CroppedImagePath { get; set; }
+        internal static Action CallBack { get; set; }
+        internal static int CroppedImageWidth { get; set; }
+        internal static int CroppedImageHeight { get; set; }
     }
 }

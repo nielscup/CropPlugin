@@ -21,11 +21,11 @@ using System.Threading;
 
 namespace Plugin.ImageCrop
 {
-	public class BackgroundJob
+	internal class BackgroundJob
     {
         #region Static helpers
 
-        public static void StartBackgroundJob(
+        internal static void StartBackgroundJob(
             MonitoredActivity activity, string title,
             string message, Action job, Handler handler)
 		{
@@ -48,7 +48,7 @@ namespace Plugin.ImageCrop
 
         #region Constructor
 
-        public BackgroundJob(MonitoredActivity activity, Action job,
+        internal BackgroundJob(MonitoredActivity activity, Action job,
 		                     ProgressDialog progressDialog, Handler handler)
 		{
 			this.activity = activity;
@@ -71,7 +71,7 @@ namespace Plugin.ImageCrop
 
         #region Methods
 
-        public void Run()
+        internal void Run()
 		{
 			try
 			{
