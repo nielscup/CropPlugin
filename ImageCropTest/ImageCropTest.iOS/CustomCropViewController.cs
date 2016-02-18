@@ -43,11 +43,14 @@ namespace ImageCropTest.iOS
             var cropButton200x300 = AddButton("200x300", buttonWidth, true);
             cropButton200x300.TouchUpInside += (s, e) => SetCropper(200, 300);
 
-            var cropButton300x200 = AddButton("200x300", buttonWidth, true);
+            var cropButton300x200 = AddButton("300x300", buttonWidth, true);
             cropButton300x200.TouchUpInside += (s, e) => SetCropper(300, 200);
 
-            var freeCropButton = AddButton("Any", buttonWidth, true);
-            freeCropButton.TouchUpInside += (s, e) => SetCropper(0, 0);
+            var anyCropButton = AddButton("Any", 40, true);
+            anyCropButton.TouchUpInside += (s, e) => SetCropper(0, 0);
+
+            var roundCropButton = AddButton("Round", 55, true);
+            roundCropButton.TouchUpInside += (s, e) => SetCropper(200, 200, true);
 
             yPos += 20;
             var cropImageViewSize = Math.Min(UIScreen.MainScreen.Bounds.Size.Width, UIScreen.MainScreen.Bounds.Size.Height);
@@ -73,9 +76,9 @@ namespace ImageCropTest.iOS
             SetCropper(0, 0);
         }
                
-        void SetCropper(int width, int height)
+        void SetCropper(int width, int height, bool isRoundImage = false)
         {
-            _imageCropView.SetImage(_imagePath, width, height);
+            _imageCropView.SetImage(_imagePath, width, height, isRoundImage);
         }
                         
         public override void DidReceiveMemoryWarning()
@@ -93,7 +96,7 @@ namespace ImageCropTest.iOS
             if (behindPreviousControl)            
                 yPos -= height;            
             else            
-                xPos = 30;    
+                xPos = 15;    
 
             var button = new UIButton(GetFrame(height, width, xPos));
             button.SetTitle(title, UIControlState.Normal);

@@ -39,14 +39,17 @@ namespace Plugin.ImageCrop
         bool saving;
         Bitmap.CompressFormat outputFormat = Bitmap.CompressFormat.Jpeg;
         HighlightView highlightView;
-        Bitmap bitmap;        
-        
+        Bitmap bitmap;
         bool scale = true;
         bool scaleUp = true;
         Handler mHandler = new Handler();
                 
-        public ImageCropView(Context context, IAttributeSet attrs)
-            : base(context, attrs)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="attrs"></param>
+        public ImageCropView(Context context, IAttributeSet attrs) : base(context, attrs)
         {
             SetLayerType(Android.Views.LayerType.Software, null);
             this.context = context;
@@ -57,7 +60,8 @@ namespace Plugin.ImageCrop
         string _imagePath;
         int _outputWidth;
         int _outputHeight;
-
+        bool _isRoundImage;
+        
         /// <summary>
         /// The local path to the image to be cropped, fi: "/storage/emulated/0/Pictures/TempPictures/myPhoto-cropped.jpg"
         /// </summary>
@@ -116,15 +120,40 @@ namespace Plugin.ImageCrop
         }
 
         /// <summary>
+        /// Determines wether the cropper is round. A round cropped round image will be saved as a square image, therefor the OuputHeight will be ignored when set to true.
+        /// </summary>
+        public bool IsRoundImage
+        {
+            get
+            {
+                return _isRoundImage;
+            }
+            set
+            {
+                if (_isRoundImage == value)
+                    return;
+
+                _isRoundImage = value;
+                SetCropper();
+            }
+        }
+
+        /// <summary>
         /// Sets the image to be cropped
         /// </summary>
         /// <param name="imagePath">the image path, fi: "/storage/emulated/0/Pictures/TempPictures/myPhoto.jpg"</param>
-        /// <param name="croppedImageWidth">The width after cropping, leave empty or set to 0 for any width</param>
-        /// <param name="croppedImageHeight">The height after cropping, leave empty or set to 0 for any height</param>
-        public void SetImage(string imagePath, int croppedImageWidth = 0, int croppedImageHeight = 0)
+        /// <param name="outputWidth">The width after cropping, leave empty or set to 0 for any width</param>
+        /// <param name="outputHeight">The height after cropping, leave empty or set to 0 for any height</param>
+        /// <param name="isRoundImage">Determines wether the cropper is round. A round cropped round image will be saved as a square image, therefor the OuputHeight will be ignored when set to true.</param>
+        public void SetImage(string imagePath, int outputWidth = 0, int outputHeight = 0, bool isRoundImage = false)
         {
-            OutputWidth = croppedImageWidth;
-            OutputHeight = croppedImageHeight;
+            IsRoundImage = isRoundImage;
+            OutputWidth = outputWidth;
+            OutputHeight = outputHeight;
+
+            if (isRoundImage)
+                OutputHeight = outputWidth;
+
             ImagePath = imagePath;
         }
 
