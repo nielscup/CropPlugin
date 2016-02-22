@@ -307,11 +307,18 @@ namespace Plugin.ImageCrop
         /// </summary>
         private void SetResizer()
         {
-            resizer.Frame = new CGRect(
-                (nfloat)(cropper.Frame.X + cropper.Frame.Width - resizerSize - cropperLineWidth),
-                (nfloat)(cropper.Frame.Y + cropper.Frame.Height - resizerSize - cropperLineWidth),
-                resizerSize,
-                resizerSize);
+            var x = (nfloat)(cropper.Frame.X + cropper.Frame.Width - resizerSize - cropperLineWidth);
+            var y = (nfloat)(cropper.Frame.Y + cropper.Frame.Height - resizerSize - cropperLineWidth);
+                        
+            //if (IsRound)
+            //{
+            //    var resizerCorrection = (((cropper.Frame.Width - (this.Frame.Size.Width - cropper.Frame.Width)) / cropper.Frame.Width)) * (resizerSize / 2);
+            //    // move resizer outward when cropper gets smaller, otherwise resizer will overlap circle
+            //    x += resizerCorrection;
+            //    y += resizerCorrection;
+            //}
+
+            resizer.Frame = new CGRect(x, y, resizerSize, resizerSize);
         }
                 
         /// <summary>
