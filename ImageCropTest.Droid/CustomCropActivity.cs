@@ -19,6 +19,8 @@ namespace ImageCropTest.Droid
         Button buttonSave;
         ImageCropView imageCropView;
         ImageView croppedImage;
+        RoundImage croppedImageRound;
+        bool _isRound;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -31,6 +33,7 @@ namespace ImageCropTest.Droid
 
             imageCropView = FindViewById<ImageCropView>(Resource.Id.imageCropper);
             croppedImage = FindViewById<ImageView>(Resource.Id.croppedImage);
+            croppedImageRound = FindViewById<RoundImage>(Resource.Id.croppedImageRound);
 
             var button300x300 = FindViewById<Button>(Resource.Id.button300x300);
             button300x300.Click += (s, e) => SetImage(300, 300);
@@ -45,7 +48,7 @@ namespace ImageCropTest.Droid
             buttonAny.Click += (s, e) => SetImage(0, 0);
 
             var buttonRound = FindViewById<Button>(Resource.Id.buttonRound);
-            buttonRound.Click += (s, e) => SetImage(0, 0, true);
+            buttonRound.Click += (s, e) => SetImage(300, 300, true);
 
             buttonSave = FindViewById<Button>(Resource.Id.buttonSave);
             buttonSave.Click += (s, e) => CropAndSaveImage();
@@ -53,7 +56,8 @@ namespace ImageCropTest.Droid
         }
 
         private void SetImage(int width, int height, bool isRound = false)
-        {            
+        {
+            _isRound = isRound;
             imageCropView.SetImage(imagePath, width, height, isRound);
 
             // or you can use:
@@ -72,7 +76,20 @@ namespace ImageCropTest.Droid
 
             // Set ImageUri to null, otherwise it will not update if set to the same URI
             croppedImage.SetImageURI(null);
-            croppedImage.SetImageURI(Android.Net.Uri.Parse(croppedImagePath));
+            croppedImageRound.SetImageURI(null);
+            croppedImage.Visibility = ViewStates.Gone;
+            croppedImageRound.Visibility = ViewStates.Gone;
+
+            if (_isRound)
+            {
+                croppedImageRound.SetImageURI(Android.Net.Uri.Parse(croppedImagePath));
+                croppedImageRound.Visibility = ViewStates.Visible;
+            }
+            else
+            {
+                croppedImage.SetImageURI(Android.Net.Uri.Parse(croppedImagePath));
+                croppedImage.Visibility = ViewStates.Visible;
+            }
         }
     }
 }
