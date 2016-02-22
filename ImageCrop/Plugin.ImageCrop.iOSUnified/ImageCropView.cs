@@ -54,10 +54,7 @@ namespace Plugin.ImageCrop
         int _outputWidth;
         int _outputHeight;
         bool _isRound;
-
-        //public event EventHandler OnImageSaved;
-        //public event EventHandler OnImageUpdated;
-         
+                 
         /// <summary>
         /// The local path to the image to be cropped, fi: "/storage/emulated/0/Pictures/TempPictures/myPhoto-cropped.jpg"
         /// </summary>
@@ -268,6 +265,9 @@ namespace Plugin.ImageCrop
 
         private void SetPreviewImage()
         {
+            if (cropper == null)
+                return;
+
             if (previewImage == null)
             {
                 previewImage = new UIImageView(new CGRect(10, PictureY - previewImageSize / 2, previewImageSize, previewImageSize / cropperAspectRatio));
@@ -434,6 +434,9 @@ namespace Plugin.ImageCrop
         public override void TouchesBegan(NSSet touches, UIEvent evt)
         {
             base.TouchesBegan(touches, evt);
+
+            if (cropper == null)
+                return;
 
             // Get the current touch
             UITouch touch = touches.AnyObject as UITouch;
