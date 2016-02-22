@@ -34,6 +34,7 @@ namespace Plugin.ImageCrop
         {
             _isRound = isRound;
             this.Frame = frame;
+            
             this.SetNeedsDisplay();
         }
                                 
@@ -50,7 +51,7 @@ namespace Plugin.ImageCrop
                 {
                     var circle = new CGPath();
                     var circleSize = rect.Size.Width / 2;
-                    circle.AddArc(circleSize, circleSize, circleSize - _lineWidth, 0, 360, false);
+                    circle.AddArc(circleSize, circleSize, circleSize, 0, 360, false);
                     g.AddPath(circle);
                 }
                 else

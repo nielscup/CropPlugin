@@ -229,12 +229,6 @@ namespace Plugin.ImageCrop
                 cropper.Reset(new RectangleF(centerCropperLocation.X, centerCropperLocation.Y, size.Width, size.Height), IsRound);
             }
 
-            if (resizer == null)
-            {
-                resizer = new CropperResizerView(cropperColor, cropperTransparency, cropperLineWidth);
-                Add(resizer);
-            }
-
             SetOverLay();
             SetResizer();
             SetPreviewImage();
@@ -301,19 +295,7 @@ namespace Plugin.ImageCrop
                 profileImageCircle.CornerRadius = 0;
             }
         }
-
-        /// <summary>
-        /// Sets the resizer triangle to resize the cropper.
-        /// </summary>
-        private void SetResizer()
-        {
-            resizer.Frame = new CGRect(
-                (nfloat)(cropper.Frame.X + cropper.Frame.Width - resizerSize - cropperLineWidth),
-                (nfloat)(cropper.Frame.Y + cropper.Frame.Height - resizerSize - cropperLineWidth),
-                resizerSize,
-                resizerSize);
-        }
-                
+                                
         /// <summary>
         /// Sets the overlay
         /// </summary>
@@ -321,14 +303,39 @@ namespace Plugin.ImageCrop
         {
             if (overlay == null)
             {
-                overlay = new CropperOverlayView(cropper.Frame, (float)PictureX, (float)PictureY);
+                overlay = new CropperOverlayView(cropper.Frame, (float)PictureX, (float)PictureY, IsRound);
                 Add(overlay);
             }
             else
             {
-                overlay.Redraw(cropper.Frame);
+                overlay.Redraw(cropper.Frame, IsRound);
                 overlay.SetNeedsDisplay();
             }
+        }
+
+        /// <summary>
+        /// Sets the resizer triangle to resize the cropper.
+        /// </summary>
+        private void SetResizer()
+        {
+            if (resizer == null)
+            {
+                resizer = new CropperResizerView(cropperColor, cropperTransparency, cropperLineWidth);
+                Add(resizer);
+            }
+
+            var x = (nfloat)(cropper.Frame.X + cropper.Frame.Width - resizerSize - cropperLineWidth);
+            var y = (nfloat)(cropper.Frame.Y + cropper.Frame.Height - resizerSize - cropperLineWidth);
+
+            if (IsRound)
+            {
+                // move resizer outward when cropper gets smaller, otherwise resizer will overlap circle
+                var resizerOffset = -cropperLineWidth + ((this.Frame.Size.Width - cropper.Frame.Width) / this.Frame.Size.Width) * resizerSize;
+                x += resizerOffset;
+                y += resizerOffset;                
+            }
+
+            resizer.Frame = new CGRect(x, y, resizerSize, resizerSize);
         }
                 
         private void HandlePinchGesture(UIPinchGestureRecognizer sender)
@@ -348,9 +355,9 @@ namespace Plugin.ImageCrop
                     var point = RestrictCropperPosition(cropperX - ((cropperWidth * scale - cropperWidth) / 2), cropperY - ((cropperHeight * scale - cropperHeight) / 2));
                     var size = RestrictCropperSize(cropperWidth * scale, cropperHeight * scale, cropper.Frame.X, cropper.Frame.Y);
                     cropper.Frame = new CGRect(point, size);
-                    cropper.SetNeedsDisplay();
-                    SetResizer();
+                    cropper.SetNeedsDisplay();                    
                     SetOverLay();
+                    SetResizer();    
                     //SetPreviewImage();
                     break;
                 case UIGestureRecognizerState.Ended:
@@ -461,8 +468,9 @@ namespace Plugin.ImageCrop
                 cropper.SetNeedsDisplay();
 
                 //SetPreviewImage();
-                SetResizer();
+                
                 SetOverLay();
+                SetResizer();
             }
             else if (resizeCropper)
             {
@@ -481,9 +489,9 @@ namespace Plugin.ImageCrop
                 cropper.SetNeedsDisplay();
                                 
                 //SetPreviewImage();
-                SetResizer();
+                
                 SetOverLay();
-
+                SetResizer();
             }
         }
 
