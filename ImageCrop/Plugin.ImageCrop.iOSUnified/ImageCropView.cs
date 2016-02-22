@@ -295,7 +295,7 @@ namespace Plugin.ImageCrop
                 profileImageCircle.CornerRadius = 0;
             }
         }
-                                
+
         /// <summary>
         /// Sets the overlay
         /// </summary>
