@@ -42,6 +42,7 @@ namespace Plugin.ImageCrop
         Bitmap bitmap;
         bool scale = true;
         bool scaleUp = true;
+        int cropperMinWidth = 100;
         Handler mHandler = new Handler();
                 
         /// <summary>
@@ -152,7 +153,12 @@ namespace Plugin.ImageCrop
             OutputHeight = outputHeight;
 
             if (isRound)
-                OutputHeight = outputWidth;
+            {
+                if (OutputWidth == 0)
+                    _outputWidth = cropperMinWidth;
+
+                OutputHeight = OutputWidth;
+            }
 
             ImagePath = imagePath;
         }
@@ -312,7 +318,7 @@ namespace Plugin.ImageCrop
 
             for (int i = 0; i < hightlightViews.Count; i++)
             {
-                hightlightViews[i].Draw(canvas);
+                hightlightViews[i].Draw(canvas, IsRound);
             }
         }
 

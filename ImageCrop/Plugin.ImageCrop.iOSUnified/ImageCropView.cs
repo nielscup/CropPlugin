@@ -37,8 +37,7 @@ namespace Plugin.ImageCrop
         nfloat cropperX;
         nfloat cropperY;
         CGRect _frame;
-        public event EventHandler OnSaved;
-        
+                
         /// <summary>
         /// Default contructor
         /// </summary>
@@ -55,7 +54,10 @@ namespace Plugin.ImageCrop
         int _outputWidth;
         int _outputHeight;
         bool _isRound;
-                                
+
+        //public event EventHandler OnImageSaved;
+        //public event EventHandler OnImageUpdated;
+         
         /// <summary>
         /// The local path to the image to be cropped, fi: "/storage/emulated/0/Pictures/TempPictures/myPhoto-cropped.jpg"
         /// </summary>
@@ -144,9 +146,14 @@ namespace Plugin.ImageCrop
             IsRound = isRound;
             OutputWidth = outputWidth;
             OutputHeight = outputHeight;
-            
+
             if (isRound)
-                OutputHeight = outputWidth;
+            {
+                if (OutputWidth == 0)
+                    _outputWidth = cropperMinWidth;
+
+                OutputHeight = OutputWidth;
+            }
 
             ImagePath = imagePath;            
         }
@@ -173,8 +180,8 @@ namespace Plugin.ImageCrop
 
                 var obj = new NSDictionary();
 
-                if (OnSaved != null)
-                    OnSaved(this, null);
+                //if (OnImageSaved != null)
+                //    OnImageSaved(this, null);
             }
             else
             {
@@ -231,7 +238,7 @@ namespace Plugin.ImageCrop
 
             SetOverLay();
             SetResizer();
-            SetPreviewImage();
+            UpdateImage();
         }      
 
         private void EnablePinch()
@@ -249,6 +256,14 @@ namespace Plugin.ImageCrop
                 cropperMinWidth = Math.Max((int)(OutputWidth * maxResizeFactor), cropperMinWidth);
                 cropperMinHeight = Math.Max((int)(OutputHeight * maxResizeFactor), cropperMinHeight);
             }
+        }
+
+        private void UpdateImage()
+        {
+            SetPreviewImage();
+
+            //if (OnImageUpdated != null)
+            //    OnImageUpdated(this, EventArgs.Empty);
         }
 
         private void SetPreviewImage()
@@ -295,7 +310,7 @@ namespace Plugin.ImageCrop
                 profileImageCircle.CornerRadius = 0;
             }
         }
-
+                
         /// <summary>
         /// Sets the overlay
         /// </summary>
@@ -361,7 +376,7 @@ namespace Plugin.ImageCrop
                     //SetPreviewImage();
                     break;
                 case UIGestureRecognizerState.Ended:
-                    SetPreviewImage();
+                    UpdateImage();
                     break;
             }
         }
@@ -443,7 +458,7 @@ namespace Plugin.ImageCrop
             base.TouchesEnded(touches, evt);
             dragCropper = false;
             resizeCropper = false;
-            SetPreviewImage();
+            UpdateImage();
         }
         
         public override void TouchesMoved(NSSet touches, UIEvent evt)

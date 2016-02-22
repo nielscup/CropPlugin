@@ -43,7 +43,7 @@ namespace Plugin.ImageCrop
         private bool maintainAspectRatio = false;
         private float initialAspectRatio;
         private float resizerSize = 80;
-                
+
         private Paint focusPaint = new Paint();
         private Paint noFocusPaint = new Paint();
         private Paint outlinePaint = new Paint();
@@ -97,6 +97,16 @@ namespace Plugin.ImageCrop
                                 (int)cropRect.Right, (int)cropRect.Bottom);
             }
         }
+
+        //// Returns the cropping rectangle in image space.
+        //internal Circle CropRect
+        //{
+        //    get
+        //    {
+        //        return new Rect((int)cropRect.Left, (int)cropRect.Top,
+        //                        (int)cropRect.Right, (int)cropRect.Bottom);
+        //    }
+        //}
 
         internal ModifyMode Mode
         {
@@ -154,7 +164,7 @@ namespace Plugin.ImageCrop
             }
         }
 
-        internal void Draw(Canvas canvas)
+        internal void Draw(Canvas canvas, bool isRound)
         {
             if (Hidden)
             {
@@ -162,41 +172,69 @@ namespace Plugin.ImageCrop
             }
 
             canvas.Save();
-            
+            var resizerPaint = new Paint { Color = new Color(255, 255, 255, 200) };
 
-            if (!Focused)
+            //if (!Focused)
+            //{
+            //    outlinePaint.Color = Color.White;
+            //    canvas.DrawRect(DrawRect, outlinePaint);
+            //    //canvas.DrawCircle(DrawRect.CenterX(), DrawRect.CenterY(), DrawRect.Width(), resizerPaint);
+            //}
+            //else
+            //{
+            Rect viewDrawingRect = new Rect();
+            context.GetDrawingRect(viewDrawingRect);
+
+            outlinePaint.Color = Color.White;// new Color(0XFF, 0xFF, 0x8A, 0x00);
+            focusPaint.Color = new Color(50, 50, 50, 125);
+
+            Path path = new Path();
+
+            if (isRound)
             {
-                outlinePaint.Color = Color.White;
-                canvas.DrawRect(DrawRect, outlinePaint);
+                path.AddCircle(DrawRect.CenterX(), DrawRect.CenterY(), DrawRect.Width() / 2, Path.Direction.Cw);
+                canvas.ClipPath(path, Region.Op.Difference);
+                canvas.DrawCircle(viewDrawingRect.CenterX(), viewDrawingRect.CenterY(), viewDrawingRect.Width(), focusPaint);
             }
             else
             {
-                Rect viewDrawingRect = new Rect();
-                context.GetDrawingRect(viewDrawingRect);
-
-                outlinePaint.Color = Color.White;// new Color(0XFF, 0xFF, 0x8A, 0x00);
-                focusPaint.Color = new Color(50, 50, 50, 125);
-
-                Path path = new Path();
                 path.AddRect(new RectF(DrawRect), Path.Direction.Cw);
-
                 canvas.ClipPath(path, Region.Op.Difference);
                 canvas.DrawRect(viewDrawingRect, focusPaint);
 
-                canvas.Restore();
-                canvas.DrawPath(path, outlinePaint);
+            }
 
-                var resizerTriangle = new Path();                
-                var resizerOffset = 4;
-                var triangleSize = resizerSize + resizerOffset;
-                resizerTriangle.MoveTo(DrawRect.Right - resizerOffset, DrawRect.Bottom - triangleSize);
-                resizerTriangle.LineTo(DrawRect.Right - resizerOffset, DrawRect.Bottom - resizerOffset);
-                resizerTriangle.LineTo(DrawRect.Right - triangleSize, DrawRect.Bottom - resizerOffset);
+            //canvas.ClipPath(path, Region.Op.Difference);
 
-                var resizerPaint = new Paint {Color = new Color(255,255,255,200)};
+            //if (isRound)
+            //    canvas.DrawCircle(viewDrawingRect.CenterX(), viewDrawingRect.CenterY(), viewDrawingRect.Width(), focusPaint);
+            //else
+            //    canvas.DrawRect(viewDrawingRect, focusPaint);
 
-                resizerPaint.SetStyle(Paint.Style.Fill);                
-                canvas.DrawPath(resizerTriangle, resizerPaint);
+            canvas.Restore();
+            canvas.DrawPath(path, outlinePaint);
+
+            var resizerTriangle = new Path();
+            var resizerOffset = 4;
+            var triangleSize = resizerSize + resizerOffset;
+            resizerTriangle.MoveTo(DrawRect.Right - resizerOffset, DrawRect.Bottom - triangleSize);
+            resizerTriangle.LineTo(DrawRect.Right - resizerOffset, DrawRect.Bottom - resizerOffset);
+            resizerTriangle.LineTo(DrawRect.Right - triangleSize, DrawRect.Bottom - resizerOffset);
+            resizerPaint.SetStyle(Paint.Style.Fill);
+            canvas.DrawPath(resizerTriangle, resizerPaint);
+
+            if (isRound)
+            {
+                // Draw the rectangle around the round cropper                
+                var roundCropperRectangle = new Path();
+                roundCropperRectangle.MoveTo(DrawRect.Left, DrawRect.Top);
+                roundCropperRectangle.LineTo(DrawRect.Right, DrawRect.Top);
+                roundCropperRectangle.LineTo(DrawRect.Right, DrawRect.Bottom);
+                roundCropperRectangle.LineTo(DrawRect.Left, DrawRect.Bottom);
+                roundCropperRectangle.LineTo(DrawRect.Left, DrawRect.Top);
+
+                resizerPaint.SetStyle(Paint.Style.Stroke);
+                canvas.DrawPath(roundCropperRectangle, resizerPaint);
             }
         }
 
@@ -212,12 +250,12 @@ namespace Plugin.ImageCrop
             bool verticalCheck = (y >= r.Top - hysteresis) && (y < r.Bottom + hysteresis);
             bool horizCheck = (x >= r.Left - hysteresis) && (x < r.Right + hysteresis);
 
-            if(x > DrawRect.Right - resizerSize && x < DrawRect.Right && y > DrawRect.Bottom - resizerSize && y < DrawRect.Bottom)
+            if (x > DrawRect.Right - resizerSize && x < DrawRect.Right && y > DrawRect.Bottom - resizerSize && y < DrawRect.Bottom)
             {
                 retval |= HitPosition.GrowRightEdge;
                 retval |= HitPosition.GrowBottomEdge;
             }
-            
+
             // Not near any edge but inside the rectangle: move.
             if (retval == HitPosition.None && r.Contains((int)x, (int)y))
             {

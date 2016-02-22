@@ -72,14 +72,17 @@ namespace ImageCropTest.Droid
 			// aapt resource value: 0x7f050003
 			public const int buttonAny = 2131034115;
 			
-			// aapt resource value: 0x7f050005
-			public const int buttonSave = 2131034117;
+			// aapt resource value: 0x7f050004
+			public const int buttonRound = 2131034116;
 			
 			// aapt resource value: 0x7f050006
-			public const int croppedImage = 2131034118;
+			public const int buttonSave = 2131034118;
 			
-			// aapt resource value: 0x7f050004
-			public const int imageCropper = 2131034116;
+			// aapt resource value: 0x7f050007
+			public const int croppedImage = 2131034119;
+			
+			// aapt resource value: 0x7f050005
+			public const int imageCropper = 2131034117;
 			
 			static Id()
 			{

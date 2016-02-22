@@ -48,18 +48,19 @@ namespace ImageCropTest.Droid
             var crop300x300Button1 = new Button(this) { Text = "Crop 300x300" };
             var crop200x300Button1 = new Button(this) { Text = "Crop 200x300" };
             var crop300x200Button1 = new Button(this) { Text = "Crop 300x200" };
-            var freeCropButton1 = new Button(this) { Text = "Crop" };            
+            var anyCropButton1 = new Button(this) { Text = "Crop" };            
 
             // External crop buttons (opens image crop in a new activity)
             buttonlayout1.AddView(crop300x300Button1);
             buttonlayout1.AddView(crop200x300Button1);
             buttonlayout1.AddView(crop300x200Button1);
-            buttonlayout1.AddView(freeCropButton1);
+            buttonlayout1.AddView(anyCropButton1);
 
             var crop300x300Button2 = new Button(this) { Text = "300x300" };
             var crop200x300Button2 = new Button(this) { Text = "200x300" };
             var crop300x200Button2 = new Button(this) { Text = "300x200" };
-            var freeCropButton2 = new Button(this) { Text = "Any" };
+            var anyCropButton2 = new Button(this) { Text = "Any" };
+            var roundCropButton2 = new Button(this) { Text = "Round" };
             
             var saveButton = new Button(this) { Text = "Save" };
 
@@ -70,7 +71,8 @@ namespace ImageCropTest.Droid
             buttonlayout2.AddView(crop300x300Button2);
             buttonlayout2.AddView(crop200x300Button2);
             buttonlayout2.AddView(crop300x200Button2);
-            buttonlayout2.AddView(freeCropButton2);            
+            buttonlayout2.AddView(anyCropButton2);
+            buttonlayout2.AddView(roundCropButton2);      
             buttonlayout2.AddView(saveButton);
 
             mainLayout.AddView(new TextView(this) { Text = "These buttons open the imagecropper intent" });
@@ -89,12 +91,13 @@ namespace ImageCropTest.Droid
             crop300x300Button1.Click += (s,e) =>  Crop(300, 300);
             crop200x300Button1.Click += (s, e) => Crop(200, 300);
             crop300x200Button1.Click += (s, e) => Crop(300, 200);
-            freeCropButton1.Click  += (s,e) =>  Crop(0, 0);
+            anyCropButton1.Click  += (s,e) =>  Crop(0, 0);
 
-            crop300x300Button2.Click += (s, e) => Crop(300, 300, false);
-            crop200x300Button2.Click += (s, e) => Crop(200, 300, false);
-            crop300x200Button2.Click += (s, e) => Crop(300, 200, false);
-            freeCropButton2.Click += (s, e) => Crop(0, 0, false);
+            crop300x300Button2.Click += (s, e) => SetCropper(300, 300);
+            crop200x300Button2.Click += (s, e) => SetCropper(200, 300);
+            crop300x200Button2.Click += (s, e) => SetCropper(300, 200);
+            anyCropButton2.Click += (s, e) => SetCropper(0, 0);
+            roundCropButton2.Click += (s, e) => SetCropper(0, 0, true);
 
             customCropViewButton.Click += customCropViewButton_Click;
             saveButton.Click += saveButton_Click;
@@ -137,7 +140,7 @@ namespace ImageCropTest.Droid
             StartActivityForResult(intent, 0);
         }
                 
-        void Crop(int width, int height, bool useExternalCropper = true)
+        void Crop(int width, int height)
         {
             if (string.IsNullOrEmpty(picturePath))
                 return;
@@ -145,16 +148,20 @@ namespace ImageCropTest.Droid
             // reset the picture to the taken picture
             SetPicture(picturePath);
 
-            croppedPicturePath = picturePath.Replace(".", "-cropped.");
+            croppedPicturePath = picturePath.Replace(".", "-cropped.");            
+            CrossImageCrop.Current.CropImage(picturePath, croppedPicturePath, () => SetPicture(croppedPicturePath), width, height);            
+        }
 
-            if (useExternalCropper)
-                CrossImageCrop.Current.CropImage(picturePath, croppedPicturePath, () => SetPicture(croppedPicturePath), width, height);
-            else            
-                imageCropView.SetImage(picturePath, width, height);
+        void SetCropper(int width, int height, bool isRound = false)
+        {
+            imageCropView.SetImage(picturePath, width, height, isRound);
         }
 
         private void SetPicture(string path)
         {
+            if (path == null)
+                return;
+
             imageView.SetImageURI(null);
             imageView.SetImageURI(Android.Net.Uri.Parse(path));            
         }

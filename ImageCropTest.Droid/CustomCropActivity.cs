@@ -44,14 +44,17 @@ namespace ImageCropTest.Droid
             var buttonAny = FindViewById<Button>(Resource.Id.buttonAny);
             buttonAny.Click += (s, e) => SetImage(0, 0);
 
+            var buttonRound = FindViewById<Button>(Resource.Id.buttonRound);
+            buttonRound.Click += (s, e) => SetImage(0, 0, true);
+
             buttonSave = FindViewById<Button>(Resource.Id.buttonSave);
             buttonSave.Click += (s, e) => CropAndSaveImage();
             buttonSave.Visibility = ViewStates.Invisible;
         }
 
-        private void SetImage(int width, int height)
-        {
-            imageCropView.SetImage(imagePath, width, height);
+        private void SetImage(int width, int height, bool isRound = false)
+        {            
+            imageCropView.SetImage(imagePath, width, height, isRound);
 
             // or you can use:
             //cropImageView.ImagePath = imagePath;
