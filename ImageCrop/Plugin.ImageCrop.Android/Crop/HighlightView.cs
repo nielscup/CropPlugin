@@ -159,7 +159,7 @@ namespace Plugin.ImageCrop
                 float xDelta = dx * (cropRect.Width() / r.Width());
                 float yDelta = dy * (cropRect.Height() / r.Height());
 
-                growBy((edge.HasFlag(HitPosition.GrowLeftEdge) ? -1 : 1) * xDelta,
+                GrowBy((edge.HasFlag(HitPosition.GrowLeftEdge) ? -1 : 1) * xDelta,
                        (edge.HasFlag(HitPosition.GrowTopEdge) ? -1 : 1) * yDelta);
             }
         }
@@ -318,7 +318,7 @@ namespace Plugin.ImageCrop
         }
 
         // Grows the cropping rectange by (dx, dy) in image space.
-        private void growBy(float dx, float dy)
+        public void GrowBy(float dx, float dy)
         {
             if (maintainAspectRatio)
             {

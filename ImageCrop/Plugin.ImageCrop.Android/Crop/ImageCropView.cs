@@ -32,6 +32,7 @@ namespace Plugin.ImageCrop
     {
         List<HighlightView> hightlightViews = new List<HighlightView>();
         HighlightView mMotionHighlightView = null;
+        readonly ScaleGestureDetector _scaleDetector;
         float mLastX;
         float mLastY;
         global::Plugin.ImageCrop.HighlightView.HitPosition motionEdge;
@@ -40,10 +41,12 @@ namespace Plugin.ImageCrop
         Bitmap.CompressFormat outputFormat = Bitmap.CompressFormat.Jpeg;
         HighlightView highlightView;
         Bitmap bitmap;
-        bool scale = true;
+        bool scaleImage = true;
         bool scaleUp = true;
+        bool isScaling = false;
         int cropperMinWidth = 100;
         Handler mHandler = new Handler();
+        float scale = 1;
                 
         /// <summary>
         /// Constructor
@@ -54,6 +57,7 @@ namespace Plugin.ImageCrop
         {
             SetLayerType(Android.Views.LayerType.Software, null);
             this.context = context;
+            _scaleDetector = new ScaleGestureDetector(context, new MyScaleListener(this));
         }
 
         #region interface implementation
@@ -229,7 +233,7 @@ namespace Plugin.ImageCrop
                 // If the output is required to a specific size then scale or fill
                 if (OutputWidth != 0 && OutputHeight != 0)
                 {
-                    if (scale)
+                    if (scaleImage)
                     {
                         // Scale the image to the required dimensions
                         Bitmap old = croppedImage;
@@ -354,10 +358,10 @@ namespace Plugin.ImageCrop
 
         public override bool OnTouchEvent(MotionEvent ev)
         {
-            if (saving)
-            {
+            if (saving)            
                 return false;
-            }
+
+            _scaleDetector.OnTouchEvent(ev);
 
             switch (ev.Action)
             {
@@ -390,10 +394,11 @@ namespace Plugin.ImageCrop
                     }
 
                     mMotionHighlightView = null;
+                    isScaling = false;
                     break;
 
                 case MotionEventActions.Move:
-                    if (mMotionHighlightView != null)
+                    if (!isScaling && mMotionHighlightView != null)
                     {
                         mMotionHighlightView.HandleMotion(motionEdge,
                                                           ev.GetX() - mLastX,
@@ -411,7 +416,7 @@ namespace Plugin.ImageCrop
                             ensureVisible(mMotionHighlightView);
                         }
                     }
-                    break;
+                    break;                    
             }
 
             switch (ev.Action)
@@ -434,6 +439,14 @@ namespace Plugin.ImageCrop
             return true;
         }
 
+        public void ScaleCropper(float scaleFactor)
+        {
+            isScaling = true;
+            highlightView.GrowBy(
+                scaleFactor * highlightView.CropRect.Width() - highlightView.CropRect.Width(), 
+                scaleFactor * highlightView.CropRect.Height() - highlightView.CropRect.Height());
+        }
+                
         #endregion
 
         #region Private helpers
@@ -541,5 +554,21 @@ namespace Plugin.ImageCrop
         }
                 
         #endregion
+    }
+
+    public  class MyScaleListener : ScaleGestureDetector.SimpleOnScaleGestureListener
+    {
+        private readonly ImageCropView _view;
+
+        public MyScaleListener(ImageCropView view)
+        {
+            _view = view;
+        }
+
+        public override bool OnScale(ScaleGestureDetector detector)
+        {
+            _view.ScaleCropper(detector.ScaleFactor);
+            return true;
+        }
     }
 }
