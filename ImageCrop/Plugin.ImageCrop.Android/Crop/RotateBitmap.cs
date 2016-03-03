@@ -20,34 +20,34 @@ using Android.Util;
 
 namespace Plugin.ImageCrop
 {
-    public class RotateBitmap
+    internal class RotateBitmap
     {
-        public const string TAG = "RotateBitmap";
+        internal const string TAG = "RotateBitmap";
 
-        public RotateBitmap(Bitmap bitmap)
+        internal RotateBitmap(Bitmap bitmap)
         {
             Bitmap = bitmap;
         }
 
-        public RotateBitmap(Bitmap bitmap, int rotation)
+        internal RotateBitmap(Bitmap bitmap, int rotation)
         {
             Bitmap = bitmap;
             Rotation = rotation % 360;
         }
 
-        public int Rotation
+        internal int Rotation
         {
             get;
             set;
         }
 
-        public Bitmap Bitmap
+        internal Bitmap Bitmap
         {
             get;
             set;
         }
 
-        public Matrix GetRotateMatrix()
+        internal Matrix GetRotateMatrix()
         {
             // By default this is an identity matrix.
             Matrix matrix = new Matrix();
@@ -67,7 +67,7 @@ namespace Plugin.ImageCrop
             return matrix;
         }
 
-        public bool IsOrientationChanged
+        internal bool IsOrientationChanged
         {
             get
             {
@@ -75,7 +75,7 @@ namespace Plugin.ImageCrop
             }
         }
 
-        public int Height
+        internal int Height
         {
             get
             {
@@ -90,7 +90,7 @@ namespace Plugin.ImageCrop
             }
         }
 
-        public int Width
+        internal int Width
         {
             get
             {

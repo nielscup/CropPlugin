@@ -3,6 +3,7 @@ using Foundation;
 using ImageCropTest.iOS.Helpers;
 using LocalAuthentication;
 using Plugin.ImageCrop;
+using Plugin.ImageCrop.Abstractions;
 using Plugin.Share;
 using System;
 using UIKit;
@@ -12,7 +13,8 @@ namespace ImageCropTest.iOS
     public partial class ViewController : UIViewController
     {
         UIImageView _picture;
-        int yPos = 50;
+        int yPos = 30;
+        int xPos;
         const int defaultSize = 300;
         string _imagePath;
         string croppedImagePath;
@@ -28,49 +30,49 @@ namespace ImageCropTest.iOS
             //SetAuthentication();
             Initialize();             
         }
-
-        void SetAuthentication()
-        {
-            yPos = 220;
-            authenticateButton = AddButton("Authenticate");
-            authenticateButton.TouchUpInside += (s, e) => AuthenticateMe(); 
-        }
-
+                
         void Initialize()
-        {            
-            yPos = 50;
-            var takePictureButton = AddButton("Take Picture");
+        {     
+            var _imageCropView = (UIView)CrossImageCrop.Current.ImageCropView;
+            _imageCropView.Frame = UIScreen.MainScreen.Bounds;
+            Add(_imageCropView);
+
+            //var _customCameraView = (UIView)CrossCustomCamera.Current.CustomCameraView;
+            //_customCameraView.BackgroundColor = UIColor.White;
+            //_customCameraView.Frame = UIScreen.MainScreen.Bounds; //View.Frame; //new CGRect(0, yPos, cropImageViewSize, cropImageViewSize);
+            //Add(_customCameraView);
+            //CrossCustomCamera.Current.CustomCameraView.Start(CameraSelection.Front);
+
+            yPos = (int)UIScreen.MainScreen.Bounds.Height - 75;
+            var buttonWidth = (int)UIScreen.MainScreen.Bounds.Width / 2;
+
+            var takePictureButton = AddButton("Take Picture", buttonWidth);
             takePictureButton.TouchUpInside += takePictureButton_TouchUpInside;
 
-            var selectPictureButton = AddButton("Select Picture");
+            var selectPictureButton = AddButton("Select Picture", buttonWidth, true);
             selectPictureButton.TouchUpInside += selectPictureButton_TouchUpInside;
+                        
+            buttonWidth = (int)UIScreen.MainScreen.Bounds.Width / 4;
+            var cropButton300x300 = AddButton("300x300", buttonWidth);
+            cropButton300x300.TouchUpInside += (s, e) => SetCropper(300, 300);
+            
+            var cropButton300x200 = AddButton("300x200", buttonWidth, true);
+            cropButton300x200.TouchUpInside += (s, e) => SetCropper(300, 200);
 
-            _picture = AddImage(300, 300);
+            var anyCropButton = AddButton("Any", buttonWidth, true);
+            anyCropButton.TouchUpInside += (s, e) => SetCropper(0, 0);
 
-            var cropButton300x300 = AddButton("Crop 300x300");
-            cropButton300x300.TouchUpInside += (s, e) => Crop(300, 300);
+            var roundCropButton = AddButton("Round", buttonWidth, true);
+            roundCropButton.TouchUpInside += (s, e) => SetCropper(200, 200, true);
 
-            var cropButton200x300 = AddButton("Crop 200x300");
-            cropButton200x300.TouchUpInside += (s, e) => Crop(200, 300);
-
-            var freeCropButton = AddButton("Crop");
-            freeCropButton.TouchUpInside += (s, e) => Crop(0, 0);
-
-            var shareButton = AddButton("Share Picture");
-            shareButton.TouchUpInside += shareButton_TouchUpInside;
-
-            var cropViewButton = AddButton("Custom Crop View");
-            cropViewButton.TouchUpInside += cropViewButton_TouchUpInside;
+            //var saveImageButton = AddButton("Save", buttonWidth, true);
+            //roundCropButton.TouchUpInside += (s, e) =>
+            //{
+            //    CrossImageCrop.Current.ImageCropView.CropAndSave(_imagePath);
+            //    SetPicture(_imagePath);
+            //};
         }
-
-        void cropViewButton_TouchUpInside(object sender, EventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(_imagePath))
-                return;
-
-            PresentViewController(new CustomCropViewController(_imagePath), true, null);
-        }
-                
+                                
         void takePictureButton_TouchUpInside(object sender, EventArgs e)
         {            
             CameraHelper.TakePicture(this, (obj) => SaveImage(obj));
@@ -80,15 +82,7 @@ namespace ImageCropTest.iOS
         {
             CameraHelper.SelectPicture(this, (obj) => SaveImage(obj));
         }
-
-        async void shareButton_TouchUpInside(object sender, EventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(croppedImagePath))
-                return;
-
-            await CrossShare.Current.ShareLocalFile(croppedImagePath);
-        }
-
+                
         void SaveImage(NSDictionary obj)
         {
             var picture = obj.ValueForKey(new NSString("UIImagePickerControllerOriginalImage")) as UIImage;
@@ -99,26 +93,27 @@ namespace ImageCropTest.iOS
             NSError err = null;
             if (imgData.Save(_imagePath, false, out err))
             {
-                SetPicture(_imagePath);
+                SetCropper();
+                //SetPicture(_imagePath);
             }
             else
             {
                 Console.WriteLine("NOT saved as " + croppedImagePath + " because" + err.LocalizedDescription);
             }
         }
-
-        void Crop(int croppedImageWidth, int croppedImageHeight)
+        
+        void SetCropper(int width = 0, int height = 0, bool isRound = false)
         {
-            if (string.IsNullOrWhiteSpace(_imagePath))
-                return;
-
-            CrossImageCrop.Current.CropImage(_imagePath, croppedImagePath, () => SetPicture(croppedImagePath), croppedImageWidth, croppedImageHeight);
+            CrossImageCrop.Current.ImageCropView.SetImage(_imagePath, width, height, isRound);
         }
                                 
         void SetPicture(string path)
         {
             if (string.IsNullOrEmpty(path))
                 return;
+
+            if (_picture == null)
+                _picture = new UIImageView();
 
             _picture.Image = new UIImage(path);
 
@@ -128,11 +123,13 @@ namespace ImageCropTest.iOS
             
             _picture.Frame = new CGRect(_picture.Frame.X, _picture.Frame.Y, _picture.Image.Size.Width * factor, _picture.Image.Size.Height * factor);
         }
-                
-        public override void DidReceiveMemoryWarning()
+
+        #region Authentication Test
+        void SetAuthentication()
         {
-            base.DidReceiveMemoryWarning();
-            // Release any cached data, images, etc that aren't in use.
+            yPos = 220;
+            authenticateButton = AddButton("Authenticate");
+            authenticateButton.TouchUpInside += (s, e) => AuthenticateMe();
         }
 
         /// <summary>
@@ -142,7 +139,7 @@ namespace ImageCropTest.iOS
         {
             var context = new LAContext();
             NSError AuthError;
-            var myReason = new NSString("To take a picture");
+            var myReason = new NSString("Login to take a picture");
 
             if (context.CanEvaluatePolicy(LAPolicy.DeviceOwnerAuthenticationWithBiometrics, out AuthError))
             {
@@ -167,32 +164,43 @@ namespace ImageCropTest.iOS
             };
         }
 
+        #endregion
+
         #region ui controls
         public UIImageView AddImage(int height, int width)
         {
-            var image = new UIImageView(GetFrame(height, width));
+            var image = new UIImageView(GetFrame(height, width, xPos));
             Add(image);
 
             return image;
         }
 
-        public UIButton AddButton(string title, int height = 40)
+        private UIButton AddButton(string title, int width = defaultSize, bool behindPreviousControl = false)
         {
-            var button = new UIButton(GetFrame(height));
+            var height = 36;
+
+            if (behindPreviousControl)
+                yPos -= height;
+            else
+                xPos = 15;
+
+            var button = new UIButton(GetFrame(height, width, xPos));
             button.SetTitle(title, UIControlState.Normal);
             button.SetTitleColor(new UIColor(1, 0, 0, 1), UIControlState.Normal);
             Add(button);
 
+            xPos += width;
+            yPos += height;
+
             return button;
         }
 
-        public CGRect GetFrame(int height = 40, int width = defaultSize)
+        private CGRect GetFrame(int height, int width, int x)
         {
-            var rect = new CGRect(40, yPos, width, height);
-            yPos += height;
-
+            var rect = new CGRect(x, yPos, width, height);
             return rect;
         }
+
         #endregion
     }
 }

@@ -9,17 +9,19 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using Plugin.ImageCrop;
+using Android.Provider;
 
 namespace ImageCropTest.Droid
 {
-    [Activity(Label = "Custom Crop View")]
-    public class CustomCropActivity : Activity
+    [Activity(Label = "Crop View", MainLauncher = true, Icon = "@drawable/icon")]
+    public class CropActivity : Activity
     {
         string imagePath;
         Button buttonSave;
         ImageCropView imageCropView;
         ImageView croppedImage;
-        RoundImage croppedImageRound;
+        RoundImageView croppedImageRound;
+        LinearLayout buttonLayout;
         bool _isRound;
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -29,43 +31,62 @@ namespace ImageCropTest.Droid
             imagePath = Intent.GetStringExtra("imagepath");
 
             // Create your application here
-            SetContentView(Resource.Layout.CustomCropView);
+            SetContentView(Resource.Layout.CropView);
+
+            buttonLayout = FindViewById<LinearLayout>(Resource.Id.buttonLayout);
+            buttonLayout.Visibility = ViewStates.Invisible;
 
             imageCropView = FindViewById<ImageCropView>(Resource.Id.imageCropper);
             croppedImage = FindViewById<ImageView>(Resource.Id.croppedImage);
-            croppedImageRound = FindViewById<RoundImage>(Resource.Id.croppedImageRound);
+            croppedImageRound = FindViewById<RoundImageView>(Resource.Id.croppedImageRound);
+
+            var buttonTakePicture = FindViewById<Button>(Resource.Id.buttonTakePicture);
+            buttonTakePicture.Click += buttonTakePicture_Click;
 
             var button300x300 = FindViewById<Button>(Resource.Id.button300x300);
-            button300x300.Click += (s, e) => SetImage(300, 300);
+            button300x300.Click += (s, e) => SetCropper(300, 300);
 
             var button200x300 = FindViewById<Button>(Resource.Id.button200x300);
-            button200x300.Click += (s, e) => SetImage(200, 300);
+            button200x300.Click += (s, e) => SetCropper(200, 300);
 
             var button300x200 = FindViewById<Button>(Resource.Id.button300x200);
-            button300x200.Click += (s, e) => SetImage(300, 200);
+            button300x200.Click += (s, e) => SetCropper(300, 200);
 
             var buttonAny = FindViewById<Button>(Resource.Id.buttonAny);
-            buttonAny.Click += (s, e) => SetImage(0, 0);
+            buttonAny.Click += (s, e) => SetCropper();
 
             var buttonRound = FindViewById<Button>(Resource.Id.buttonRound);
-            buttonRound.Click += (s, e) => SetImage(300, 300, true);
+            buttonRound.Click += (s, e) => SetCropper(300, 300, true);
 
             buttonSave = FindViewById<Button>(Resource.Id.buttonSave);
             buttonSave.Click += (s, e) => CropAndSaveImage();
             buttonSave.Visibility = ViewStates.Invisible;
         }
 
-        private void SetImage(int width, int height, bool isRound = false)
+        void buttonTakePicture_Click(object sender, EventArgs e)
         {
+            Intent intent = new Intent(MediaStore.ActionImageCapture);
+            var file = new Java.IO.File(CreateDirectoryForPictures(), string.Format("myPhoto.jpg", System.Guid.NewGuid()));
+            imagePath = file.Path;
+            intent.PutExtra(MediaStore.ExtraOutput, Android.Net.Uri.FromFile(file));
+            StartActivityForResult(intent, 0);
+        }
+
+        protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
+        {
+            SetCropper();
+        }
+
+        private void SetCropper(int width = 0, int height = 0, bool isRound = false)
+        {
+            if (string.IsNullOrEmpty(imagePath))
+                return;
+
             _isRound = isRound;
             imageCropView.SetImage(imagePath, width, height, isRound);
-
-            // or you can use:
-            //cropImageView.ImagePath = imagePath;
-            //cropImageView.OutputWidth = width;
-            //cropImageView.OutputHeight = height;
-
+            
             buttonSave.Visibility = ViewStates.Visible;
+            buttonLayout.Visibility = ViewStates.Visible;
         }
 
         private void CropAndSaveImage()
@@ -90,6 +111,17 @@ namespace ImageCropTest.Droid
                 croppedImage.SetImageURI(Android.Net.Uri.Parse(croppedImagePath));
                 croppedImage.Visibility = ViewStates.Visible;
             }
+        }
+
+        private Java.IO.File CreateDirectoryForPictures()
+        {
+            var dir = new Java.IO.File(Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryPictures), "TempPictures");
+            if (!dir.Exists())
+            {
+                dir.Mkdirs();
+            }
+
+            return dir;
         }
     }
 }

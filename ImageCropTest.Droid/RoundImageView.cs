@@ -8,13 +8,13 @@ using System;
 
 namespace ImageCropTest.Droid
 {
-    [Register("ImageCropTest.Droid.RoundImage")]
-    public class RoundImage : ImageView
+    [Register("ImageCropTest.Droid.RoundImageView")]
+    public class RoundImageView : ImageView
     {
-        protected RoundImage(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer) { }
-        public RoundImage(Context context) : this(context, null) { }
-        public RoundImage(Context context, IAttributeSet attrs) : this(context, attrs, 0) { }
-        public RoundImage(Context context, IAttributeSet attrs, int defStyle) : base(context, attrs, defStyle) { }
+        protected RoundImageView(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer) { }
+        public RoundImageView(Context context) : this(context, null) { }
+        public RoundImageView(Context context, IAttributeSet attrs) : this(context, attrs, 0) { }
+        public RoundImageView(Context context, IAttributeSet attrs, int defStyle) : base(context, attrs, defStyle) { }
 
         protected override void OnDraw(Canvas canvas)
         {

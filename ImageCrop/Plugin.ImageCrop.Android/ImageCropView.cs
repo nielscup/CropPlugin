@@ -27,6 +27,9 @@ using Plugin.ImageCrop.Abstractions;
 
 namespace Plugin.ImageCrop
 {
+    /// <summary>
+    /// The image crop view
+    /// </summary>
     [Register("plugin.imagecrop.android.ImageCropView")]
     public class ImageCropView : ImageViewTouchBase, IImageCropView
     {
@@ -46,7 +49,7 @@ namespace Plugin.ImageCrop
         bool isScaling = false;
         int cropperMinWidth = 100;
         Handler mHandler = new Handler();
-        float scale = 1;
+        //float scale = 1;
                 
         /// <summary>
         /// Constructor
@@ -58,6 +61,9 @@ namespace Plugin.ImageCrop
             SetLayerType(Android.Views.LayerType.Software, null);
             this.context = context;
             _scaleDetector = new ScaleGestureDetector(context, new MyScaleListener(this));
+
+            // make this view available in the PCL
+            ImageCropInstance.ImageCropView = this;
         }
 
         #region interface implementation

@@ -31,22 +31,29 @@ namespace Plugin.ImageCrop
         nfloat cropperLineWidth = 3;
         nfloat marginY = 80;
         nfloat marginX = 0;
-
         nfloat cropperWidth;
         nfloat cropperHeight;
         nfloat cropperX;
         nfloat cropperY;
         CGRect _frame;
-                
+
         /// <summary>
-        /// Default contructor
+        /// Default contructor that initializes an instance of this class with no parameters
         /// </summary>
-        public ImageCropView(CGRect frame)
+        public ImageCropView()
         {
             UserInteractionEnabled = true;
-            this.Frame = frame;
-            _frame = frame;
         }
+                
+        ///// <summary>
+        ///// Default contructor
+        ///// </summary>
+        //public ImageCropView(CGRect frame)
+        //{
+        //    UserInteractionEnabled = true;
+        //    this.Frame = frame;
+        //    _frame = frame;
+        //}
 
         #region interface implementation
 
@@ -174,11 +181,6 @@ namespace Plugin.ImageCrop
             if (imgData.Save(destinationPath, false, out err))
             {
                 Console.WriteLine("saved as " + destinationPath);
-
-                var obj = new NSDictionary();
-
-                //if (OnImageSaved != null)
-                //    OnImageSaved(this, null);
             }
             else
             {
@@ -190,6 +192,7 @@ namespace Plugin.ImageCrop
                                 
         private void Initialize()
         {
+            _frame = this.Frame;
             if (string.IsNullOrWhiteSpace(ImagePath))
                 return;
 
@@ -258,9 +261,6 @@ namespace Plugin.ImageCrop
         private void UpdateImage()
         {
             SetPreviewImage();
-
-            //if (OnImageUpdated != null)
-            //    OnImageUpdated(this, EventArgs.Empty);
         }
 
         private void SetPreviewImage()

@@ -2,14 +2,14 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="2.8.1">
     <id>Plugin.ImageCrop</id>
-    <version>0.0.18</version>
+    <version>0.0.19</version>
     <title>ImageCrop Plugin</title>
     <authors>Niels Cup</authors>
     <owners>Niels Cup</owners>
     <licenseUrl>https://github.com/nielscup/ImageCrop/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/nielscup/ImageCrop</projectUrl>
     <!--Default Icon, a template can be found:  https://raw.githubusercontent.com/jamesmontemagno/Xamarin-Templates/master/Plugins-Templates/icons/plugin_icon.png-->
-    <iconUrl>https://pbs.twimg.com/profile_images/463679742076387328/VnPmeVeO.jpeg</iconUrl>
+    <iconUrl>https://cupitcontent.blob.core.windows.net/images/cup-it.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>
       Crop images with iOS and Android

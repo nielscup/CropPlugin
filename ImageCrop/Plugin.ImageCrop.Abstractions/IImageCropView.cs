@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Plugin.ImageCrop.Abstractions
 {
+    /// <summary>
+    /// The view for cropping images
+    /// </summary>
     public interface IImageCropView
     {        
         /// <summary>

@@ -49,9 +49,7 @@
       <Link>CrossImageCrop.cs</Link>
     </Compile>
     <Compile Include="Crop\BackgroundJob.cs" />
-    <Compile Include="Crop\ImageCropActivityLauncher.cs" />
-    <Compile Include="Crop\ImageCropActivity.cs" />
-    <Compile Include="Crop\ImageCropView.cs" />
+    <Compile Include="ImageCropView.cs" />
     <Compile Include="Crop\HighlightView.cs" />
     <Compile Include="Crop\ImageViewTouchBase.cs" />
     <Compile Include="Crop\MonitoredActivity.cs" />

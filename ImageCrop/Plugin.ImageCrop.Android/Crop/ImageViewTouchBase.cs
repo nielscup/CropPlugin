@@ -52,7 +52,7 @@ namespace Plugin.ImageCrop
         private float[] matrixValues = new float[9];
 
         // The current bitmap being displayed.
-        protected RotateBitmap bitmapDisplayed = new RotateBitmap(null);
+        internal RotateBitmap bitmapDisplayed = new RotateBitmap(null);
 
         private int thisWidth = -1;
         private int thisHeight = -1;
@@ -121,7 +121,7 @@ namespace Plugin.ImageCrop
             SetImageRotateBitmapResetBase(new RotateBitmap(bitmap), resetSupp);
         }
 
-        public void SetImageRotateBitmapResetBase(RotateBitmap bitmap, bool resetSupp)
+        internal void SetImageRotateBitmapResetBase(RotateBitmap bitmap, bool resetSupp)
         {
             int viewWidth = Width;
 
