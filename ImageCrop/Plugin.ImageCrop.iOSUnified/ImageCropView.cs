@@ -265,7 +265,7 @@ namespace Plugin.ImageCrop
 
         private void SetPreviewImage()
         {
-            //return;
+            return;
 
             if (cropper == null)
                 return;
