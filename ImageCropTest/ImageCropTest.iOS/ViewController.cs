@@ -47,10 +47,10 @@ namespace ImageCropTest.iOS
 
             _customCameraView = (UIView)CrossCustomCamera.Current.CustomCameraView;
             _customCameraView.BackgroundColor = UIColor.White;
-            _customCameraView.Frame = frame; //View.Frame; //new CGRect(0, yPos, cropImageViewSize, cropImageViewSize);
+            _customCameraView.Frame = frame;
             Add(_customCameraView);
             CrossCustomCamera.Current.CustomCameraView.Start(CameraSelection.Front);
-
+            
             yPos = (int)UIScreen.MainScreen.Bounds.Height - 75;
             var buttonWidth = (int)UIScreen.MainScreen.Bounds.Width / 2;
 
@@ -67,24 +67,25 @@ namespace ImageCropTest.iOS
             var cropButton300x200 = AddButton("300x200", buttonWidth, true);
             cropButton300x200.TouchUpInside += (s, e) => SetCropper(300, 200);
 
-            var anyCropButton = AddButton("Any", buttonWidth, true);
+            var anyCropButton = AddButton("Any", 34, true);
             anyCropButton.TouchUpInside += (s, e) => SetCropper(0, 0);
 
-            var roundCropButton = AddButton("Round", buttonWidth, true);
+            var roundCropButton = AddButton("Round", 56, true);
             roundCropButton.TouchUpInside += (s, e) => SetCropper(200, 200, true);
 
-            //var saveImageButton = AddButton("Save", buttonWidth, true);
-            //roundCropButton.TouchUpInside += (s, e) =>
-            //{
-            //    CrossImageCrop.Current.ImageCropView.CropAndSave(_imagePath);
-            //    SetPicture(_imagePath);
-            //};
+            var saveImageButton = AddButton("Save", 56, true);
+            saveImageButton.TouchUpInside += (s, e) =>
+            {
+                CrossImageCrop.Current.ImageCropView.CropAndSave(_imagePath);
+                SetPicture(_imagePath);
+            };
         }
 
         void takePictureButton_TouchUpInside(object sender, EventArgs e)
         {
             if (_customCameraView.Hidden == true)
             {
+                _picture.Hidden = true;
                 _customCameraView.Hidden = false;
                 _imageCropView.Hidden = true;
                 CrossCustomCamera.Current.CustomCameraView.Reset();
@@ -102,9 +103,9 @@ namespace ImageCropTest.iOS
 
         void selectPictureButton_TouchUpInside(object sender, EventArgs e)
         {
+            _picture.Hidden = true;
             _customCameraView.Hidden = true;
-            CameraHelper.SelectPicture(this, (obj) => SaveImage(obj));
-            
+            CameraHelper.SelectPicture(this, (obj) => SaveImage(obj));            
         }
 
         void SaveImage(NSDictionary obj)
@@ -129,7 +130,6 @@ namespace ImageCropTest.iOS
         void SetCropper(int width = 0, int height = 0, bool isRound = false)
         {
             _imageCropView.Hidden = false;
-            //CrossImageCrop.Current.ImageCropView.SetImage("", width, height, isRound);
             CrossImageCrop.Current.ImageCropView.SetImage(_imagePath, width, height, isRound);
         }
 
@@ -137,17 +137,28 @@ namespace ImageCropTest.iOS
         {
             if (string.IsNullOrEmpty(path))
                 return;
+                        
+            _imageCropView.Hidden = true;
+            _customCameraView.Hidden = true;
 
             if (_picture == null)
+            {
                 _picture = new UIImageView();
+                Add(_picture);
+            }
 
+            _picture.Hidden = false;
             _picture.Image = new UIImage(path);
 
             var factorW = defaultSize / _picture.Image.Size.Width;
             var factorH = defaultSize / _picture.Image.Size.Height;
             var factor = Math.Min(factorW, factorH);
-
-            _picture.Frame = new CGRect(_picture.Frame.X, _picture.Frame.Y, _picture.Image.Size.Width * factor, _picture.Image.Size.Height * factor);
+            var w = _picture.Image.Size.Width * factor;
+            var h = _picture.Image.Size.Height * factor;
+            var x = ((int)UIScreen.MainScreen.Bounds.Width - w) / 2;
+            var y = ((int)UIScreen.MainScreen.Bounds.Height - h) / 2;
+            //_picture.Frame = new CGRect(_picture.Frame.X, _picture.Frame.Y, _picture.Image.Size.Width * factor, _picture.Image.Size.Height * factor);
+            _picture.Frame = new CGRect(x, y, w, h);
         }
 
         #region Authentication Test

@@ -34,6 +34,7 @@ namespace Plugin.ImageCrop
         nfloat cropperX;
         nfloat cropperY;
         CGRect _frame;
+        UIImage croppedImage;
 
         /// <summary>
         /// Default contructor that initializes an instance of this class with no parameters
@@ -264,9 +265,7 @@ namespace Plugin.ImageCrop
         }
 
         private void SetPreviewImage()
-        {
-            return;
-
+        {            
             if (cropper == null)
                 return;
 
@@ -276,6 +275,9 @@ namespace Plugin.ImageCrop
                 AddShadow(ref previewImage);
                 Add(previewImage);
             }
+
+            // DISABLE PREVIEWIMAGE
+            previewImage.Hidden = true;
 
             // set preview image size
             var width = previewImageSize;
