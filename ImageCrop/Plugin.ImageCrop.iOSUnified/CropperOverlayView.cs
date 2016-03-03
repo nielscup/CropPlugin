@@ -18,11 +18,25 @@ namespace Plugin.ImageCrop
         internal CropperOverlayView(CGRect rect, float width, float height, bool isRound)
         {
             _rect = rect;
-            _width = width;
-            _height = height;
             _isRound = isRound;
-            this.Frame = new RectangleF(0, 0, width, height);
+            _width = width;
+            _height = height;            
+            this.Frame = new RectangleF(0, 0, _width, _height);
             this.BackgroundColor = UIColor.Clear;
+        }
+
+        public override CGRect Frame
+        {
+            get
+            {
+                return base.Frame;
+            }
+            set
+            {
+                base.Frame = value;
+                _width = (float)base.Frame.Width;
+                _height = (float)base.Frame.Height;
+            }
         }
 
         internal void Redraw(CGRect rect, bool isRound)

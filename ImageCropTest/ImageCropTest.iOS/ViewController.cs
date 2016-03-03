@@ -2,6 +2,8 @@
 using Foundation;
 using ImageCropTest.iOS.Helpers;
 using LocalAuthentication;
+using Plugin.CustomCamera;
+using Plugin.CustomCamera.Abstractions;
 using Plugin.ImageCrop;
 using Plugin.ImageCrop.Abstractions;
 using Plugin.Share;
@@ -19,6 +21,8 @@ namespace ImageCropTest.iOS
         string _imagePath;
         string croppedImagePath;
         UIButton authenticateButton;
+        UIView _customCameraView;
+        UIView _imageCropView;
 
         public ViewController(IntPtr handle) : base(handle) { }
 
@@ -28,20 +32,24 @@ namespace ImageCropTest.iOS
             // Perform any additional setup after loading the view, typically from a nib.
 
             //SetAuthentication();
-            Initialize();             
+            Initialize();
         }
-                
+
         void Initialize()
-        {     
-            var _imageCropView = (UIView)CrossImageCrop.Current.ImageCropView;
-            _imageCropView.Frame = UIScreen.MainScreen.Bounds;
+        {
+            var frame = UIScreen.MainScreen.Bounds;
+            frame.Y = 20;
+            frame.Height -= 100;
+            //frame.Width -= 40;
+            _imageCropView = (UIView)CrossImageCrop.Current.ImageCropView;
+            _imageCropView.Frame = frame;
             Add(_imageCropView);
 
-            //var _customCameraView = (UIView)CrossCustomCamera.Current.CustomCameraView;
-            //_customCameraView.BackgroundColor = UIColor.White;
-            //_customCameraView.Frame = UIScreen.MainScreen.Bounds; //View.Frame; //new CGRect(0, yPos, cropImageViewSize, cropImageViewSize);
-            //Add(_customCameraView);
-            //CrossCustomCamera.Current.CustomCameraView.Start(CameraSelection.Front);
+            _customCameraView = (UIView)CrossCustomCamera.Current.CustomCameraView;
+            _customCameraView.BackgroundColor = UIColor.White;
+            _customCameraView.Frame = frame; //View.Frame; //new CGRect(0, yPos, cropImageViewSize, cropImageViewSize);
+            Add(_customCameraView);
+            CrossCustomCamera.Current.CustomCameraView.Start(CameraSelection.Front);
 
             yPos = (int)UIScreen.MainScreen.Bounds.Height - 75;
             var buttonWidth = (int)UIScreen.MainScreen.Bounds.Width / 2;
@@ -51,11 +59,11 @@ namespace ImageCropTest.iOS
 
             var selectPictureButton = AddButton("Select Picture", buttonWidth, true);
             selectPictureButton.TouchUpInside += selectPictureButton_TouchUpInside;
-                        
+
             buttonWidth = (int)UIScreen.MainScreen.Bounds.Width / 4;
             var cropButton300x300 = AddButton("300x300", buttonWidth);
             cropButton300x300.TouchUpInside += (s, e) => SetCropper(300, 300);
-            
+
             var cropButton300x200 = AddButton("300x200", buttonWidth, true);
             cropButton300x200.TouchUpInside += (s, e) => SetCropper(300, 200);
 
@@ -72,17 +80,33 @@ namespace ImageCropTest.iOS
             //    SetPicture(_imagePath);
             //};
         }
-                                
+
         void takePictureButton_TouchUpInside(object sender, EventArgs e)
-        {            
-            CameraHelper.TakePicture(this, (obj) => SaveImage(obj));
+        {
+            if (_customCameraView.Hidden == true)
+            {
+                _customCameraView.Hidden = false;
+                _imageCropView.Hidden = true;
+                CrossCustomCamera.Current.CustomCameraView.Reset();
+                return;
+            }
+
+            //CameraHelper.TakePicture(this, (obj) => SaveImage(obj));
+            CrossCustomCamera.Current.CustomCameraView.TakePicture((path) =>
+                {
+                    _imagePath = path;
+                    SetCropper();
+                    _customCameraView.Hidden = true;
+                });
         }
 
         void selectPictureButton_TouchUpInside(object sender, EventArgs e)
         {
+            _customCameraView.Hidden = true;
             CameraHelper.SelectPicture(this, (obj) => SaveImage(obj));
+            
         }
-                
+
         void SaveImage(NSDictionary obj)
         {
             var picture = obj.ValueForKey(new NSString("UIImagePickerControllerOriginalImage")) as UIImage;
@@ -101,12 +125,14 @@ namespace ImageCropTest.iOS
                 Console.WriteLine("NOT saved as " + croppedImagePath + " because" + err.LocalizedDescription);
             }
         }
-        
+
         void SetCropper(int width = 0, int height = 0, bool isRound = false)
         {
+            _imageCropView.Hidden = false;
+            //CrossImageCrop.Current.ImageCropView.SetImage("", width, height, isRound);
             CrossImageCrop.Current.ImageCropView.SetImage(_imagePath, width, height, isRound);
         }
-                                
+
         void SetPicture(string path)
         {
             if (string.IsNullOrEmpty(path))
@@ -120,7 +146,7 @@ namespace ImageCropTest.iOS
             var factorW = defaultSize / _picture.Image.Size.Width;
             var factorH = defaultSize / _picture.Image.Size.Height;
             var factor = Math.Min(factorW, factorH);
-            
+
             _picture.Frame = new CGRect(_picture.Frame.X, _picture.Frame.Y, _picture.Image.Size.Width * factor, _picture.Image.Size.Height * factor);
         }
 

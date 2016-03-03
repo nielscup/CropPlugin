@@ -29,8 +29,6 @@ namespace Plugin.ImageCrop
         double cropperAspectRatio = 1;
         nfloat cropperTransparency = 0.8f;
         nfloat cropperLineWidth = 3;
-        nfloat marginY = 80;
-        nfloat marginX = 0;
         nfloat cropperWidth;
         nfloat cropperHeight;
         nfloat cropperX;
@@ -44,17 +42,7 @@ namespace Plugin.ImageCrop
         {
             UserInteractionEnabled = true;
         }
-                
-        ///// <summary>
-        ///// Default contructor
-        ///// </summary>
-        //public ImageCropView(CGRect frame)
-        //{
-        //    UserInteractionEnabled = true;
-        //    this.Frame = frame;
-        //    _frame = frame;
-        //}
-
+        
         #region interface implementation
 
         string _imagePath;
@@ -73,8 +61,8 @@ namespace Plugin.ImageCrop
             }
             set
             {
-                if (_imagePath == value)
-                    return;
+                //if (_imagePath == value)
+                //    return;
 
                 _imagePath = value;
                 Initialize();
@@ -189,10 +177,22 @@ namespace Plugin.ImageCrop
         }
         
         # endregion
-                                
+
+        public override CGRect Frame
+        {
+            get
+            {
+                return base.Frame;
+            }
+            set
+            {
+                base.Frame = value;
+                _frame = this.Frame;
+            }
+        }
+         
         private void Initialize()
         {
-            _frame = this.Frame;
             if (string.IsNullOrWhiteSpace(ImagePath))
                 return;
 
@@ -203,13 +203,11 @@ namespace Plugin.ImageCrop
 
             pic = new UIImage(ImagePath);
 
-            var scaledPicture = ResizeImage(pic, (float)_frame.Size.Width, (float)_frame.Size.Height);
-            marginX = (_frame.Size.Width - scaledPicture.Size.Width) / 2;
-
+            var scaledPicture = ResizeImage(pic, (float)_frame.Size.Width, (float)_frame.Size.Height);  
             this.Image = scaledPicture;
-            this.Frame = new CGRect(marginX, marginY, (int)scaledPicture.Size.Width, (int)scaledPicture.Size.Height);
-                                   
-            SetCropper();
+            base.Frame = new CGRect(_frame.X + (_frame.Width - scaledPicture.Size.Width) / 2, _frame.Y + (_frame.Height - scaledPicture.Size.Height) / 2, (int)scaledPicture.Size.Width, (int)scaledPicture.Size.Height);
+                                            
+            SetCropper();                        
         }
 
         /// <summary>
@@ -235,8 +233,10 @@ namespace Plugin.ImageCrop
             {
                 cropper.Reset(new RectangleF(centerCropperLocation.X, centerCropperLocation.Y, size.Width, size.Height), IsRound);
             }
-
+                        
             SetOverLay();
+            overlay.Frame = new CGRect(0,0, base.Frame.Width, base.Frame.Height);
+
             SetResizer();
             UpdateImage();
         }      
@@ -265,6 +265,8 @@ namespace Plugin.ImageCrop
 
         private void SetPreviewImage()
         {
+            //return;
+
             if (cropper == null)
                 return;
 
@@ -323,7 +325,7 @@ namespace Plugin.ImageCrop
             }
             else
             {
-                overlay.Redraw(cropper.Frame, IsRound);
+                overlay.Redraw(cropper.Frame, IsRound);                
                 overlay.SetNeedsDisplay();
             }
         }
@@ -373,7 +375,6 @@ namespace Plugin.ImageCrop
                     cropper.SetNeedsDisplay();                    
                     SetOverLay();
                     SetResizer();    
-                    //SetPreviewImage();
                     break;
                 case UIGestureRecognizerState.Ended:
                     UpdateImage();
