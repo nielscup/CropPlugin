@@ -205,6 +205,7 @@ namespace Plugin.ImageCrop
             if (string.IsNullOrWhiteSpace(ImagePath))
                 return;
 
+
             bitmap = Util.GetBitmap(_imagePath, context.ContentResolver);
             SetImageBitmapResetBase(bitmap, true);
             AddHighlightView(bitmap);
@@ -574,9 +575,6 @@ namespace Plugin.ImageCrop
 
             RectF cropRect = new RectF(x, y, x + cropWidth, y + cropHeight);
 
-            //int x = (width - OutputWidth) / 2;
-            //int y = (height - OutputHeight) / 2;
-            //RectF cropRect = new RectF(x, y, OutputWidth, OutputHeight);
             highlightView.Setup(this.ImageMatrix, imageRect, cropRect, OutputWidth != 0 && OutputHeight != 0);
 
             this.ClearHighlightViews();

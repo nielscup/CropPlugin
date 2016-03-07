@@ -155,6 +155,7 @@ namespace Plugin.ImageCrop
             return b3;
         }
 
+        static Bitmap bitmap;
         internal static Bitmap GetBitmap(String path, ContentResolver contentResolver)
         {
             var uri = GetImageUri(path);
@@ -171,21 +172,29 @@ namespace Plugin.ImageCrop
 
                 BitmapFactory.DecodeStream(ins, null, o);
                 ins.Close();
+                ins.Dispose();
 
                 int scale = 1;
                 if (o.OutHeight > IMAGE_MAX_SIZE || o.OutWidth > IMAGE_MAX_SIZE)
                 {
-                    //scale = Math.Max(o.OutHeight / IMAGE_MAX_SIZE, o.OutWidth / IMAGE_MAX_SIZE);
                     scale = (int)Math.Pow(2, (int)Math.Round(Math.Log(IMAGE_MAX_SIZE / (double)Math.Max(o.OutHeight, o.OutWidth)) / Math.Log(0.5)));
                 }
 
                 BitmapFactory.Options o2 = new BitmapFactory.Options();
                 o2.InSampleSize = (int)scale;
                 ins = contentResolver.OpenInputStream(uri);
-                Bitmap b = BitmapFactory.DecodeStream(ins, null, o2);
-                ins.Close();
 
-                return b;
+                // Recycle bitmap to prevent out of memory exception
+                if (bitmap != null)
+                    bitmap.Recycle();
+
+                bitmap = BitmapFactory.DecodeStream(ins, null, o2);
+                
+                ins.Close();
+                ins.Dispose();
+
+                return bitmap;
+                
             }
             catch (Exception e)
             {

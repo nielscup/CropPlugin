@@ -12,6 +12,7 @@ using Plugin.ImageCrop;
 using Android.Provider;
 using Plugin.CustomCamera;
 using Plugin.CustomCamera.Abstractions;
+using Android.Graphics.Drawables;
 
 namespace ImageCropTest.Droid
 {
@@ -25,6 +26,7 @@ namespace ImageCropTest.Droid
         RoundImageView _croppedImageRound;
         LinearLayout _buttonLayout;
         Button _buttonTakePicture;
+        Button _buttonSave;
         bool _isRound;
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -43,6 +45,7 @@ namespace ImageCropTest.Droid
             _buttonLayout.Visibility = ViewStates.Gone;
 
             _imageCropView = FindViewById<ImageCropView>(Resource.Id.imageCropper);
+            _imageCropView.Visibility = ViewStates.Gone;
             _croppedImage = FindViewById<ImageView>(Resource.Id.croppedImage);
             _croppedImage.Visibility = ViewStates.Gone;
             _croppedImageRound = FindViewById<RoundImageView>(Resource.Id.croppedImageRound);
@@ -66,18 +69,22 @@ namespace ImageCropTest.Droid
             var buttonRound = FindViewById<Button>(Resource.Id.buttonRound);
             buttonRound.Click += (s, e) => SetCropper(300, 300, true);
 
-            var buttonSave = FindViewById<Button>(Resource.Id.buttonSave);
-            buttonSave.Click += (s, e) => CropAndSaveImage();
+            _buttonSave = FindViewById<Button>(Resource.Id.buttonSave);
+            _buttonSave.Click += (s, e) => CropAndSaveImage();
+            _buttonSave.Visibility = ViewStates.Gone;
         }
 
         void buttonTakePicture_Click(object sender, EventArgs e)
         {
             if(_croppedImage.Visibility == ViewStates.Visible || _croppedImageRound.Visibility == ViewStates.Visible || _imageCropView.Visibility == ViewStates.Visible)
             {
+                _croppedImage.SetImageBitmap(null);
                 _croppedImage.Visibility = ViewStates.Gone;
+
                 _croppedImageRound.Visibility = ViewStates.Gone;
                 _imageCropView.Visibility = ViewStates.Gone;
                 _buttonLayout.Visibility = ViewStates.Gone;
+                _buttonSave.Visibility = ViewStates.Gone;
                 _customCamera.Visibility = ViewStates.Visible;
                 _customCamera.Reset();
                 
@@ -88,12 +95,11 @@ namespace ImageCropTest.Droid
             {
                 try
                 {
-                    //_imagePath
                     _imagePath = path;
                     SetCropper();
                     _customCamera.Visibility = ViewStates.Gone;
                     _imageCropView.Visibility = ViewStates.Visible;
-                    //SetCropper();
+                    _buttonSave.Visibility = ViewStates.Visible;
                 }
                 catch (Exception ex)
                 {
@@ -108,6 +114,14 @@ namespace ImageCropTest.Droid
             //intent.PutExtra(MediaStore.ExtraOutput, Android.Net.Uri.FromFile(file));
             //StartActivityForResult(intent, 0);
         }
+
+        //private void FreeImageMemory(ref ImageView imageView)
+        //{
+        //    imageView.SetImageBitmap(null);
+        //    _bitmap.Recycle();
+        //    _bitmap.Dispose();
+        //    _bitmap = null;
+        //}
 
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
@@ -131,11 +145,13 @@ namespace ImageCropTest.Droid
 
             _imageCropView.CropAndSave(croppedImagePath);
 
-            // Set ImageUri to null, otherwise it will not update if set to the same URI
-            _croppedImage.SetImageURI(null);
-            _croppedImageRound.SetImageURI(null);
+            // Set ImageUri to null, otherwise it will not update if set to the same URI, and prevent out of memory exceptions
+            _croppedImage.SetImageURI(null);            
             _croppedImage.Visibility = ViewStates.Gone;
+
+            _croppedImageRound.SetImageURI(null);
             _croppedImageRound.Visibility = ViewStates.Gone;
+
             _buttonLayout.Visibility = ViewStates.Gone;
             _imageCropView.Visibility = ViewStates.Gone;
 
