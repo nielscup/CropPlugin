@@ -24,6 +24,7 @@ using Android.Runtime;
 using Android.OS;
 using Android.Widget;
 using Plugin.ImageCrop.Abstractions;
+using Android.App;
 
 namespace Plugin.ImageCrop
 {
@@ -49,6 +50,8 @@ namespace Plugin.ImageCrop
         bool isScaling = false;
         int cropperMinWidth = 100;
         Handler mHandler = new Handler();
+        int _width;
+        int _height;
         //float scale = 1;
                 
         /// <summary>
@@ -62,8 +65,20 @@ namespace Plugin.ImageCrop
             this.context = context;
             _scaleDetector = new ScaleGestureDetector(context, new MyScaleListener(this));
 
+            GetScreenResolution(context);
+
             // make this view available in the PCL
             ImageCropInstance.ImageCropView = this;
+        }
+
+        private void GetScreenResolution(Context context)
+        {
+            var display = ((Activity)context).WindowManager.DefaultDisplay;
+            DisplayMetrics metrics = new DisplayMetrics();
+            display.GetMetrics(metrics);
+
+            _width = metrics.WidthPixels;
+            _height = metrics.HeightPixels;
         }
 
         #region interface implementation
@@ -84,8 +99,8 @@ namespace Plugin.ImageCrop
             }
             set
             {
-                if (_imagePath == value)
-                    return;
+                //if (_imagePath == value)
+                //    return;
 
                 _imagePath = value;
                 SetCropper();
@@ -500,6 +515,9 @@ namespace Plugin.ImageCrop
             float thisWidth = Width;
             float thisHeight = Height;
 
+            thisWidth = _width;
+            thisHeight = _height;
+
             float z1 = thisWidth / width * .6F;
             float z2 = thisHeight / height * .6F;
 
@@ -532,19 +550,22 @@ namespace Plugin.ImageCrop
 
             Rect imageRect = new Rect(0, 0, width, height);
 
+            
             // make the default size about 4/5 of the width or height
             int cropWidth = width * 4 / 5; //Math.Min(width, height) * 4 / 5;
             int cropHeight = height * 4 / 5;
 
             if (OutputWidth != 0 && OutputHeight != 0)
             {
-                if (OutputWidth > OutputHeight)
+                if(OutputWidth < OutputHeight)
                 {
-                    cropHeight = cropWidth * OutputHeight / OutputWidth;
+                    var aspectRatio =  (float)OutputWidth / (float)OutputHeight;
+                    cropWidth = (int)(cropHeight * aspectRatio);
                 }
                 else
                 {
-                    cropWidth = cropHeight * OutputWidth / OutputHeight;
+                    var aspectRatio = (float)OutputHeight / (float)OutputWidth;
+                    cropHeight = (int)(cropWidth * aspectRatio);
                 }
             }
 
@@ -552,11 +573,17 @@ namespace Plugin.ImageCrop
             int y = (height - cropHeight) / 2;
 
             RectF cropRect = new RectF(x, y, x + cropWidth, y + cropHeight);
+
+            //int x = (width - OutputWidth) / 2;
+            //int y = (height - OutputHeight) / 2;
+            //RectF cropRect = new RectF(x, y, OutputWidth, OutputHeight);
             highlightView.Setup(this.ImageMatrix, imageRect, cropRect, OutputWidth != 0 && OutputHeight != 0);
 
             this.ClearHighlightViews();
             highlightView.Focused = true;
             this.AddHighlightView(highlightView);
+
+            Center(true, true);
         }
                 
         #endregion

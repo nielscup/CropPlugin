@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+using Android.App;
 using Android.Content;
 using Android.Graphics;
 using Android.OS;
@@ -63,21 +64,33 @@ namespace Plugin.ImageCrop
         private Handler handler = new Handler();
 
         private Action onLayoutRunnable = null;
+        int _width;
+        int _height;
 
         #endregion
 
         #region Constructor
 
-        public ImageViewTouchBase(Context context)
-            : base(context)
+        public ImageViewTouchBase(Context context): base(context)
         {
+            GetScreenResolution(context);
             init();
         }
 
-        public ImageViewTouchBase(Context context, IAttributeSet attrs)
-            : base(context, attrs)
+        public ImageViewTouchBase(Context context, IAttributeSet attrs) : base(context, attrs)
         {
+            GetScreenResolution(context);
             init();
+        }
+
+        private void GetScreenResolution(Context context)
+        {
+            var display = ((Activity)context).WindowManager.DefaultDisplay;
+            DisplayMetrics metrics = new DisplayMetrics();
+            display.GetMetrics(metrics);
+
+            _width = metrics.WidthPixels;
+            _height = metrics.HeightPixels;
         }
 
         #endregion
@@ -123,7 +136,7 @@ namespace Plugin.ImageCrop
 
         internal void SetImageRotateBitmapResetBase(RotateBitmap bitmap, bool resetSupp)
         {
-            int viewWidth = Width;
+            int viewWidth = _width; //Width;
 
             if (viewWidth <= 0)
             {
@@ -151,7 +164,7 @@ namespace Plugin.ImageCrop
                 suppMatrix.Reset();
             }
             ImageMatrix = GetImageViewMatrix();
-            this.maxZoom = CalculateMaxZoom();
+            //this.maxZoom = CalculateMaxZoom();                        
         }
 
 
@@ -182,6 +195,8 @@ namespace Plugin.ImageCrop
                 getProperBaseMatrix(bitmapDisplayed, baseMatrix);
                 ImageMatrix = GetImageViewMatrix();
             }
+
+            Center(true, true);
         }
 
         public override bool OnKeyDown(Keycode keyCode, KeyEvent e)
@@ -190,7 +205,7 @@ namespace Plugin.ImageCrop
             {
                 // If we're zoomed in, pressing Back jumps out to show the entire
                 // image, otherwise Back returns the user to the gallery.
-                ZoomTo(1.0f);
+                //ZoomTo(1.0f);
                 return true;
             }
 
@@ -207,11 +222,8 @@ namespace Plugin.ImageCrop
         #region Properties
 
         public int IvLeft { get; private set; }
-
         public int IvRight { get; private set; }
-
         public int IvTop { get; private set; }
-
         public int IvBottom { get; private set; }
 
         #endregion
@@ -242,8 +254,8 @@ namespace Plugin.ImageCrop
         /// </summary>
         private void getProperBaseMatrix(RotateBitmap bitmap, Matrix matrix)
         {
-            float viewWidth = Width;
-            float viewHeight = Height;
+            float viewWidth = _width; //Width;
+            float viewHeight = _height; //Height;
 
             float w = bitmap.Width;
             float h = bitmap.Height;
@@ -252,8 +264,8 @@ namespace Plugin.ImageCrop
 
             // We limit up-scaling to 2x otherwise the result may look bad if it's
             // a small icon.
-            float widthScale = Math.Min(viewWidth / w, 2.0f);
-            float heightScale = Math.Min(viewHeight / h, 2.0f);
+            float widthScale = viewWidth / w; //Math.Min(viewWidth / w, 2.0f);
+            float heightScale = viewHeight / h; //Math.Min(viewHeight / h, 2.0f);
             float scale = Math.Min(widthScale, heightScale);
 
             matrix.PostConcat(bitmap.GetRotateMatrix());
@@ -274,131 +286,7 @@ namespace Plugin.ImageCrop
 
             return displayMatrix;
         }
-
-        // Sets the maximum zoom, which is a scale relative to the base matrix. It
-        // is calculated to show the image at 400% zoom regardless of screen or
-        // image orientation. If in the future we decode the full 3 megapixel image,
-        // rather than the current 1024x768, this should be changed down to 200%.
-        protected float CalculateMaxZoom()
-        {
-            if (bitmapDisplayed.Bitmap == null)
-            {
-                return 1F;
-            }
-
-            float fw = (float)bitmapDisplayed.Width / (float)thisWidth;
-            float fh = (float)bitmapDisplayed.Height / (float)thisHeight;
-            float max = Math.Max(fw, fh) * 4;
-
-            return max;
-        }
-
-        protected virtual void ZoomTo(float scale, float centerX, float centerY)
-        {
-            if (scale > maxZoom)
-            {
-                scale = maxZoom;
-            }
-
-            float oldScale = GetScale();
-            float deltaScale = scale / oldScale;
-
-            suppMatrix.PostScale(deltaScale, deltaScale, centerX, centerY);
-            ImageMatrix = GetImageViewMatrix();
-            Center(true, true);
-        }
-
-        protected void ZoomTo(float scale, float centerX,
-                               float centerY, float durationMs)
-        {
-            float incrementPerMs = (scale - GetScale()) / durationMs;
-            float oldScale = GetScale();
-
-            long startTime = System.Environment.TickCount;
-
-            Action anim = null;
-
-            anim = () =>
-            {
-                long now = System.Environment.TickCount;
-                float currentMs = Math.Min(durationMs, now - startTime);
-                float target = oldScale + (incrementPerMs * currentMs);
-                ZoomTo(target, centerX, centerY);
-
-                if (currentMs < durationMs)
-                {
-                    handler.Post(anim);
-                }
-            };
-
-            handler.Post(anim);
-        }
-
-        protected void ZoomTo(float scale)
-        {
-            float cx = Width / 2F;
-            float cy = Height / 2F;
-
-            ZoomTo(scale, cx, cy);
-        }
-
-        protected virtual void ZoomIn()
-        {
-            ZoomIn(SCALE_RATE);
-        }
-
-        protected virtual void ZoomOut()
-        {
-            ZoomOut(SCALE_RATE);
-        }
-
-        protected virtual void ZoomIn(float rate)
-        {
-            if (GetScale() >= maxZoom)
-            {
-                // Don't let the user zoom into the molecular level.
-                return;
-            }
-
-            if (bitmapDisplayed.Bitmap == null)
-            {
-                return;
-            }
-
-            float cx = Width / 2F;
-            float cy = Height / 2F;
-
-            suppMatrix.PostScale(rate, rate, cx, cy);
-            ImageMatrix = GetImageViewMatrix();
-        }
-
-        protected void ZoomOut(float rate)
-        {
-            if (bitmapDisplayed.Bitmap == null)
-            {
-                return;
-            }
-
-            float cx = Width / 2F;
-            float cy = Height / 2F;
-
-            // Zoom out to at most 1x.
-            Matrix tmp = new Matrix(suppMatrix);
-            tmp.PostScale(1F / rate, 1F / rate, cx, cy);
-
-            if (GetScale(tmp) < 1F)
-            {
-                suppMatrix.SetScale(1F, 1F, cx, cy);
-            }
-            else
-            {
-                suppMatrix.PostScale(1F / rate, 1F / rate, cx, cy);
-            }
-
-            ImageMatrix = GetImageViewMatrix();
-            Center(true, true);
-        }
-
+                
         protected virtual void PostTranslate(float dx, float dy)
         {
             suppMatrix.PostTranslate(dx, dy);
@@ -410,7 +298,6 @@ namespace Plugin.ImageCrop
             ImageMatrix = GetImageViewMatrix();
         }
 
-
         /// <summary>
         /// Center as much as possible in one or both axis.  Centering is
         /// defined as follows:  if the image is scaled down below the
@@ -420,6 +307,7 @@ namespace Plugin.ImageCrop
         /// </summary>
         protected void Center(bool horizontal, bool vertical)
         {
+            //return;
             if (bitmapDisplayed.Bitmap == null)
             {
                 return;
@@ -457,7 +345,7 @@ namespace Plugin.ImageCrop
 
             if (horizontal)
             {
-                int viewWidth = Width;
+                int viewWidth = _width; //Width;
                 if (width < viewWidth)
                 {
                     deltaX = (viewWidth - width) / 2 - rect.Left;
@@ -481,3 +369,130 @@ namespace Plugin.ImageCrop
     }
 }
 
+
+//// Sets the maximum zoom, which is a scale relative to the base matrix. It
+//// is calculated to show the image at 400% zoom regardless of screen or
+//// image orientation. If in the future we decode the full 3 megapixel image,
+//// rather than the current 1024x768, this should be changed down to 200%.
+//protected float CalculateMaxZoom()
+//{
+//    if (bitmapDisplayed.Bitmap == null)
+//    {
+//        return 1F;
+//    }
+
+//    float fw = (float)bitmapDisplayed.Width / (float)thisWidth;
+//    float fh = (float)bitmapDisplayed.Height / (float)thisHeight;
+//    float max = Math.Max(fw, fh) * 4;
+
+//    return max;
+//}
+
+//protected virtual void ZoomTo(float scale, float centerX, float centerY)
+//{
+//    if (scale > maxZoom)
+//    {
+//        scale = maxZoom;
+//    }
+
+//    float oldScale = GetScale();
+//    float deltaScale = scale / oldScale;
+
+//    suppMatrix.PostScale(deltaScale, deltaScale, centerX, centerY);
+//    ImageMatrix = GetImageViewMatrix();
+//    Center(true, true);
+//}
+
+//protected void ZoomTo(float scale, float centerX,
+//                       float centerY, float durationMs)
+//{
+//    float incrementPerMs = (scale - GetScale()) / durationMs;
+//    float oldScale = GetScale();
+
+//    long startTime = System.Environment.TickCount;
+
+//    Action anim = null;
+
+//    anim = () =>
+//    {
+//        long now = System.Environment.TickCount;
+//        float currentMs = Math.Min(durationMs, now - startTime);
+//        float target = oldScale + (incrementPerMs * currentMs);
+//        ZoomTo(target, centerX, centerY);
+
+//        if (currentMs < durationMs)
+//        {
+//            handler.Post(anim);
+//        }
+//    };
+
+//    handler.Post(anim);
+//}
+
+//protected void ZoomTo(float scale)
+//{
+//    //float cx = Width / 2F;
+//    //float cy = Height / 2F;
+
+//    float cx = _width / 2F;
+//    float cy = _height / 2F;
+
+//    ZoomTo(scale, cx, cy);
+//}
+
+//protected virtual void ZoomIn()
+//{
+//    ZoomIn(SCALE_RATE);
+//}
+
+//protected virtual void ZoomOut()
+//{
+//    ZoomOut(SCALE_RATE);
+//}
+
+//protected virtual void ZoomIn(float rate)
+//{
+//    if (GetScale() >= maxZoom)
+//    {
+//        // Don't let the user zoom into the molecular level.
+//        return;
+//    }
+
+//    if (bitmapDisplayed.Bitmap == null)
+//    {
+//        return;
+//    }
+
+//    float cx = Width / 2F;
+//    float cy = Height / 2F;
+
+//    suppMatrix.PostScale(rate, rate, cx, cy);
+//    ImageMatrix = GetImageViewMatrix();
+//}
+
+//protected void ZoomOut(float rate)
+//{
+//    if (bitmapDisplayed.Bitmap == null)
+//    {
+//        return;
+//    }
+
+//    float cx = Width / 2F;
+//    float cy = Height / 2F;
+
+//    // Zoom out to at most 1x.
+//    Matrix tmp = new Matrix(suppMatrix);
+//    tmp.PostScale(1F / rate, 1F / rate, cx, cy);
+
+//    if (GetScale(tmp) < 1F)
+//    {
+//        suppMatrix.SetScale(1F, 1F, cx, cy);
+//    }
+//    else
+//    {
+//        suppMatrix.PostScale(1F / rate, 1F / rate, cx, cy);
+//    }
+
+//    ImageMatrix = GetImageViewMatrix();
+//    Center(true, true);
+//}

@@ -1,4 +1,5 @@
-﻿using CoreGraphics;
+﻿using CoreAnimation;
+using CoreGraphics;
 using Foundation;
 using ImageCropTest.iOS.Helpers;
 using LocalAuthentication;
@@ -23,6 +24,7 @@ namespace ImageCropTest.iOS
         UIButton authenticateButton;
         UIView _customCameraView;
         UIView _imageCropView;
+        bool _isRound;
 
         public ViewController(IntPtr handle) : base(handle) { }
 
@@ -45,7 +47,7 @@ namespace ImageCropTest.iOS
             _imageCropView.Frame = frame;
             Add(_imageCropView);
 
-            _customCameraView = (UIView)CrossCustomCamera.Current.CustomCameraView;
+            _customCameraView = (UIView)CrossCustomCamera.Current.CustomCameraView;            
             _customCameraView.BackgroundColor = UIColor.White;
             _customCameraView.Frame = frame;
             Add(_customCameraView);
@@ -67,7 +69,7 @@ namespace ImageCropTest.iOS
             var cropButton300x200 = AddButton("300x200", buttonWidth, true);
             cropButton300x200.TouchUpInside += (s, e) => SetCropper(300, 200);
 
-            var anyCropButton = AddButton("Any", 34, true);
+            var anyCropButton = AddButton("Any", 38, true);
             anyCropButton.TouchUpInside += (s, e) => SetCropper(0, 0);
 
             var roundCropButton = AddButton("Round", 56, true);
@@ -125,10 +127,13 @@ namespace ImageCropTest.iOS
             {
                 Console.WriteLine("NOT saved as " + croppedImagePath + " because" + err.LocalizedDescription);
             }
+
+
         }
 
         void SetCropper(int width = 0, int height = 0, bool isRound = false)
         {
+            _isRound = isRound;
             _imageCropView.Hidden = false;
             CrossImageCrop.Current.ImageCropView.SetImage(_imagePath, width, height, isRound);
         }
@@ -157,8 +162,20 @@ namespace ImageCropTest.iOS
             var h = _picture.Image.Size.Height * factor;
             var x = ((int)UIScreen.MainScreen.Bounds.Width - w) / 2;
             var y = ((int)UIScreen.MainScreen.Bounds.Height - h) / 2;
-            //_picture.Frame = new CGRect(_picture.Frame.X, _picture.Frame.Y, _picture.Image.Size.Width * factor, _picture.Image.Size.Height * factor);
             _picture.Frame = new CGRect(x, y, w, h);
+
+            CALayer profileImageCircle = _picture.Layer;
+            profileImageCircle.MasksToBounds = true;  
+
+            if (_isRound)
+            {
+                // make previewImage round                
+                profileImageCircle.CornerRadius = _picture.Frame.Size.Width / 2;
+            }
+            else
+            {
+                profileImageCircle.CornerRadius = 0;
+            }
         }
 
         #region Authentication Test

@@ -9,64 +9,73 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="Take Picture" />
-    <LinearLayout
-        android:id="@+id/buttonLayout"
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:visibility="visible">
-        <Button
-            android:id="@+id/button300x300"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="300x300" />
-        <Button
-            android:id="@+id/button200x300"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="200x300" />
-        <Button
-            android:id="@+id/button300x200"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="300x200" />
-        <Button
-            android:id="@+id/buttonAny"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Any" />
-        <Button
-            android:id="@+id/buttonRound"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Round" />
-    </LinearLayout>
-    <plugin.imagecrop.android.ImageCropView
-        android:id="@+id/imageCropper"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <Button
-        android:id="@+id/buttonSave"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Save"
-        android:layout_gravity="center_horizontal" />
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal">
-        <ImageView
-            android:id="@+id/croppedImage"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_gravity="center_horizontal"
-            android:scaleType="fitCenter" />
-        <ImageCropTest.Droid.RoundImageView
-            android:id="@+id/croppedImageRound"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:scaleType="fitCenter" />
-    </LinearLayout>
+        android:layout_height="match_parent">
+        <plugin.imagecrop.android.ImageCropView
+            android:id="@+id/imageCropper"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true" />
+        <plugin.customcamera.android.CustomCameraView
+            android:id="@+id/customCamera"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal">
+            <ImageView
+                android:id="@+id/croppedImage"
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:layout_gravity="center_horizontal"
+                android:scaleType="fitCenter" />
+            <ImageCropTest.Droid.RoundImageView
+                android:id="@+id/croppedImageRound"
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:scaleType="fitCenter" />
+            <LinearLayout
+                android:id="@+id/buttonLayout"
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true">
+                <Button
+                    android:id="@+id/button300x300"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="300x300" />
+                <Button
+                    android:id="@+id/button300x200"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="300x200" />
+                <Button
+                    android:id="@+id/button200x300"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="200x300" />
+                <Button
+                    android:id="@+id/buttonAny"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Any" />
+                <Button
+                    android:id="@+id/buttonRound"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Round" />
+                <Button
+                    android:id="@+id/buttonSave"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Save"
+                    android:layout_gravity="center_horizontal" />
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
 </LinearLayout>

@@ -97,17 +97,7 @@ namespace Plugin.ImageCrop
                                 (int)cropRect.Right, (int)cropRect.Bottom);
             }
         }
-
-        //// Returns the cropping rectangle in image space.
-        //internal Circle CropRect
-        //{
-        //    get
-        //    {
-        //        return new Rect((int)cropRect.Left, (int)cropRect.Top,
-        //                        (int)cropRect.Right, (int)cropRect.Bottom);
-        //    }
-        //}
-
+                
         internal ModifyMode Mode
         {
             get
@@ -397,6 +387,9 @@ namespace Plugin.ImageCrop
         // Maps the cropping rectangle from image space to screen space.
         private Rect computeLayout()
         {
+            //return new Rect((int)cropRect.Left, (int)cropRect.Top,
+            //                    (int)cropRect.Right, (int)cropRect.Bottom);
+
             RectF r = new RectF(cropRect.Left, cropRect.Top,
                                 cropRect.Right, cropRect.Bottom);
             matrix.MapRect(r);
