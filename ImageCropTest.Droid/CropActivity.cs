@@ -39,7 +39,7 @@ namespace ImageCropTest.Droid
             SetContentView(Resource.Layout.CropView);
 
             _customCamera = FindViewById<CustomCameraView>(Resource.Id.customCamera);
-            _customCamera.Start(CameraSelection.Back);
+            _customCamera.Start(CameraSelection.Front);
 
             _buttonLayout = FindViewById<LinearLayout>(Resource.Id.buttonLayout);
             _buttonLayout.Visibility = ViewStates.Gone;
@@ -60,8 +60,8 @@ namespace ImageCropTest.Droid
             var button300x200 = FindViewById<Button>(Resource.Id.button300x200);
             button300x200.Click += (s, e) => SetCropper(300, 200);
 
-            var button200x300 = FindViewById<Button>(Resource.Id.button200x300);
-            button200x300.Click += (s, e) => SetCropper(200, 300);
+            //var button200x300 = FindViewById<Button>(Resource.Id.button200x300);
+            //button200x300.Click += (s, e) => SetCropper(200, 300);
 
             var buttonAny = FindViewById<Button>(Resource.Id.buttonAny);
             buttonAny.Click += (s, e) => SetCropper();

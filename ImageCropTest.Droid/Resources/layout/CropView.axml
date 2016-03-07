@@ -66,11 +66,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="300x200" />
-                <Button
-                    android:id="@+id/button200x300"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="200x300" />
+            <!--<Button
+            android:id="@+id/button200x300"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="200x300" />-->
                 <Button
                     android:id="@+id/buttonAny"
                     android:layout_width="wrap_content"
