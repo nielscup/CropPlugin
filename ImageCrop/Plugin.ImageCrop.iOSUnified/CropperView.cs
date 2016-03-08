@@ -37,7 +37,9 @@ namespace Plugin.ImageCrop
             
             this.SetNeedsDisplay();
         }
-                                
+
+
+        nfloat endangle = (nfloat)(360 * Math.PI) / 180;
         public override void Draw(CGRect rect)
         {
             //get graphics context
@@ -51,7 +53,8 @@ namespace Plugin.ImageCrop
                 {
                     var circle = new CGPath();
                     var circleSize = rect.Size.Width / 2;
-                    circle.AddArc(circleSize, circleSize, circleSize, 0, 360, false);
+                    circle.AddArc(circleSize, circleSize, circleSize, 0, endangle, true);
+                    Console.WriteLine("circleSize: {0}", circleSize);
                     g.AddPath(circle);
                 }
                 else

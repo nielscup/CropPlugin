@@ -63,19 +63,6 @@ namespace Plugin.ImageCrop
                 else
                     _overlay.AddRect(new RectangleF((float)_rect.X, (float)_rect.Y, (float)_rect.Width, (float)_rect.Height));
 
-                //_overlay.AddArc(20, 20, 10, 0, 360, false);
-                //g.EOClip();
-                
-
-                //// top
-                //_overlay.AddRect(new RectangleF(0f, 0f, _width, (float)_rect.Y));
-                //// left
-                //_overlay.AddRect(new RectangleF(0f, (float)_rect.Y, (float)_rect.X, (float)_rect.Height));
-                //// right
-                //_overlay.AddRect(new RectangleF((float)_rect.X + (float)_rect.Width, (float)_rect.Y, _width - ((float)_rect.X + (float)_rect.Width), (float)_rect.Height));
-                //// bottom
-                //_overlay.AddRect(new RectangleF(0f, (float)_rect.Y + (float)_rect.Height, _width, _height - ((float)_rect.Y + (float)_rect.Height)));
-
                 g.SetStrokeColor(UIColor.Clear.CGColor);
                 g.SetAlpha(0.6f);
 

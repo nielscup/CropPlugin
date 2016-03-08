@@ -26,6 +26,12 @@ namespace ImageCropTest.iOS
         UIView _imageCropView;
         bool _isRound;
 
+        UIButton cropButton300x300;
+        UIButton cropButton300x200;
+        UIButton anyCropButton;
+        UIButton roundCropButton;
+        UIButton saveImageButton;        
+
         public ViewController(IntPtr handle) : base(handle) { }
 
         public override void ViewDidLoad()
@@ -42,7 +48,6 @@ namespace ImageCropTest.iOS
             var frame = UIScreen.MainScreen.Bounds;
             frame.Y = 20;
             frame.Height -= 100;
-            //frame.Width -= 40;
             _imageCropView = (UIView)CrossImageCrop.Current.ImageCropView;
             _imageCropView.Frame = frame;
             Add(_imageCropView);
@@ -63,33 +68,47 @@ namespace ImageCropTest.iOS
             selectPictureButton.TouchUpInside += selectPictureButton_TouchUpInside;
 
             buttonWidth = (int)UIScreen.MainScreen.Bounds.Width / 4;
-            var cropButton300x300 = AddButton("300x300", buttonWidth);
+            cropButton300x300 = AddButton("300x300", buttonWidth);
             cropButton300x300.TouchUpInside += (s, e) => SetCropper(300, 300);
 
-            var cropButton300x200 = AddButton("300x200", buttonWidth, true);
+            cropButton300x200 = AddButton("300x200", buttonWidth, true);
             cropButton300x200.TouchUpInside += (s, e) => SetCropper(300, 200);
 
-            var anyCropButton = AddButton("Any", 38, true);
+            anyCropButton = AddButton("Any", 38, true);
             anyCropButton.TouchUpInside += (s, e) => SetCropper(0, 0);
 
-            var roundCropButton = AddButton("Round", 56, true);
+            roundCropButton = AddButton("Round", 56, true);
             roundCropButton.TouchUpInside += (s, e) => SetCropper(200, 200, true);
 
-            var saveImageButton = AddButton("Save", 56, true);
+            saveImageButton = AddButton("Save", 56, true);
             saveImageButton.TouchUpInside += (s, e) =>
             {
                 CrossImageCrop.Current.ImageCropView.CropAndSave(_imagePath);
                 SetPicture(_imagePath);
             };
+
+            ShowButtons(false);
+        }
+
+        void ShowButtons(bool isVisible)
+        {
+            cropButton300x300.Hidden = !isVisible;
+            cropButton300x200.Hidden = !isVisible;
+            anyCropButton.Hidden = !isVisible;
+            roundCropButton.Hidden = !isVisible;
+            saveImageButton.Hidden = !isVisible;
         }
 
         void takePictureButton_TouchUpInside(object sender, EventArgs e)
         {
             if (_customCameraView.Hidden == true)
             {
-                _picture.Hidden = true;
+                if(_picture != null)
+                    _picture.Hidden = true;
+                
                 _customCameraView.Hidden = false;
                 _imageCropView.Hidden = true;
+                ShowButtons(false);
                 CrossCustomCamera.Current.CustomCameraView.Reset();
                 return;
             }
@@ -127,14 +146,13 @@ namespace ImageCropTest.iOS
             {
                 Console.WriteLine("NOT saved as " + croppedImagePath + " because" + err.LocalizedDescription);
             }
-
-
         }
 
         void SetCropper(int width = 0, int height = 0, bool isRound = false)
         {
             _isRound = isRound;
             _imageCropView.Hidden = false;
+            ShowButtons(true);
             CrossImageCrop.Current.ImageCropView.SetImage(_imagePath, width, height, isRound);
         }
 
