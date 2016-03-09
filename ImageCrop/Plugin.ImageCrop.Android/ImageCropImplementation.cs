@@ -13,12 +13,7 @@ namespace Plugin.ImageCrop
     /// Implementation for ImageCrop
     /// </summary>
     public class ImageCropImplementation : IImageCrop
-    {
-        //internal ImageCropImplementation()
-        //{
-        //    ImageCropInstance.ImageCropView = new ImageCropView(Application.Context, null);
-        //}
-
+    {        
         /// <summary>
         /// Instance of the Custom Camera View
         /// </summary>

@@ -44,11 +44,11 @@
     <Reference Include="Mono.Android" />
     <Reference Include="mscorlib" />
     <Reference Include="Plugin.CustomCamera, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Plugin.CustomCamera.0.0.15\lib\MonoAndroid10\Plugin.CustomCamera.dll</HintPath>
+      <HintPath>..\packages\Plugin.CustomCamera.0.0.16\lib\MonoAndroid10\Plugin.CustomCamera.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Plugin.CustomCamera.Abstractions, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Plugin.CustomCamera.0.0.15\lib\MonoAndroid10\Plugin.CustomCamera.Abstractions.dll</HintPath>
+      <HintPath>..\packages\Plugin.CustomCamera.0.0.16\lib\MonoAndroid10\Plugin.CustomCamera.Abstractions.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Plugin.Share, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">

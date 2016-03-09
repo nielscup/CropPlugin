@@ -22,8 +22,6 @@ namespace ImageCropTest.iOS
         string _imagePath;
         string croppedImagePath;
         UIButton authenticateButton;
-        UIView _customCameraView;
-        UIView _imageCropView;
         bool _isRound;
 
         UIButton cropButton300x300;
@@ -48,14 +46,12 @@ namespace ImageCropTest.iOS
             var frame = UIScreen.MainScreen.Bounds;
             frame.Y = 20;
             //frame.Height -= 100;
-            _imageCropView = (UIView)CrossImageCrop.Current.ImageCropView;
-            _imageCropView.Frame = frame;
-            Add(_imageCropView);
+            ((UIView)CrossImageCrop.Current.ImageCropView).Frame = frame;
+            Add((UIView)CrossImageCrop.Current.ImageCropView);
 
-            _customCameraView = (UIView)CrossCustomCamera.Current.CustomCameraView;            
-            _customCameraView.BackgroundColor = UIColor.White;
-            _customCameraView.Frame = frame;
-            Add(_customCameraView);
+            ((UIView)CrossCustomCamera.Current.CustomCameraView).BackgroundColor = UIColor.White;
+            ((UIView)CrossCustomCamera.Current.CustomCameraView).Frame = frame;
+            Add((UIView)CrossCustomCamera.Current.CustomCameraView);
             CrossCustomCamera.Current.CustomCameraView.Start(CameraSelection.Front);
             
             yPos = (int)UIScreen.MainScreen.Bounds.Height - 75;
@@ -101,31 +97,30 @@ namespace ImageCropTest.iOS
 
         void takePictureButton_TouchUpInside(object sender, EventArgs e)
         {
-            if (_customCameraView.Hidden == true)
+            if (((UIView)CrossCustomCamera.Current.CustomCameraView).Hidden == true)
             {
                 if(_picture != null)
                     _picture.Hidden = true;
-                
-                _customCameraView.Hidden = false;
-                _imageCropView.Hidden = true;
+
+                ((UIView)CrossCustomCamera.Current.CustomCameraView).Hidden = false;
+                ((UIView)CrossImageCrop.Current.ImageCropView).Hidden = true;
                 ShowButtons(false);
                 CrossCustomCamera.Current.CustomCameraView.Reset();
                 return;
             }
 
-            //CameraHelper.TakePicture(this, (obj) => SaveImage(obj));
             CrossCustomCamera.Current.CustomCameraView.TakePicture((path) =>
                 {
                     _imagePath = path;
                     SetCropper();
-                    _customCameraView.Hidden = true;
+                    ((UIView)CrossCustomCamera.Current.CustomCameraView).Hidden = true;
                 });
         }
 
         void selectPictureButton_TouchUpInside(object sender, EventArgs e)
         {
             _picture.Hidden = true;
-            _customCameraView.Hidden = true;
+            ((UIView)CrossCustomCamera.Current.CustomCameraView).Hidden = true;
             CameraHelper.SelectPicture(this, (obj) => SaveImage(obj));            
         }
 
@@ -151,7 +146,7 @@ namespace ImageCropTest.iOS
         void SetCropper(int width = 0, int height = 0, bool isRound = false)
         {
             _isRound = isRound;
-            _imageCropView.Hidden = false;
+            ((UIView)CrossImageCrop.Current.ImageCropView).Hidden = false;
             ShowButtons(true);
             CrossImageCrop.Current.ImageCropView.SetImage(_imagePath, width, height, isRound);
         }
@@ -160,9 +155,9 @@ namespace ImageCropTest.iOS
         {
             if (string.IsNullOrEmpty(path))
                 return;
-                        
-            _imageCropView.Hidden = true;
-            _customCameraView.Hidden = true;
+
+            ((UIView)CrossImageCrop.Current.ImageCropView).Hidden = true;
+            ((UIView)CrossCustomCamera.Current.CustomCameraView).Hidden = true;
 
             if (_picture == null)
             {
