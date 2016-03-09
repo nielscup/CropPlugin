@@ -27,7 +27,7 @@ public override void ViewDidLoad()
     	
 	// Add the imageCropView control to your view:
 	_imageCropView = (UIView)CrossImageCrop.Current.ImageCropView;
-	_imageCropView.Frame = View.Frame frame;
+	_imageCropView.Frame = View.Frame;
 	Add(_imageCropView);
 }
 ```
