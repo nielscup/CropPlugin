@@ -47,7 +47,7 @@ namespace ImageCropTest.iOS
         {
             var frame = UIScreen.MainScreen.Bounds;
             frame.Y = 20;
-            frame.Height -= 100;
+            //frame.Height -= 100;
             _imageCropView = (UIView)CrossImageCrop.Current.ImageCropView;
             _imageCropView.Frame = frame;
             Add(_imageCropView);
