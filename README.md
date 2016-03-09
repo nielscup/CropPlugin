@@ -17,37 +17,42 @@ nuget pack Plugin.ImageCrop.nuspec
 
 Call **CrossShare.Current** from any project or PCL to gain access to APIs.
 
-**Crop Image**
+**iOS**
 ```
-/// <summary>
-/// Crop Image to a specified width and height, maintains aspect ratio
-/// </summary>
-/// <param name="imagePath">The path to the image to be cropped. example: ../pictures/picture.jpg</param>
-/// <param name="croppedImagePath">The path to the image after cropping. This can be the same as imagePath, the image will then be overwritten. example: ../pictures/picture-cropped.jpg</param>
-/// <param name="callback">The action to execute after cropping</param>
-/// <param name="croppedImageWidth">The width of the image after cropping</param>
-/// <param name="croppedImageHeight">The height of the image after cropping</param>
-/// <returns>Task</returns>
-Task CropImage(string imagePath, string croppedImagePath, Action callback, int croppedImageWidth, int croppedImageHeight);
+UIView _imageCropView;
+
+public override void ViewDidLoad()
+{
+	base.ViewDidLoad();
+    	
+	// Add the imageCropView control to your view:
+	_imageCropView = (UIView)CrossImageCrop.Current.ImageCropView;
+	_imageCropView.Frame = View.Frame frame;
+	Add(_imageCropView);
+}
 ```
+
+**Android**
 ```
-/// <summary>
-/// Crop Image
-/// </summary>
-/// <param name="imagePath">The path to the image to be cropped. example: ../pictures/picture.jpg</param>
-/// <param name="croppedImagePath">The path to the image after cropping. This can be the same as imagePath, the image will then be overwritten. example: ../pictures/picture-cropped.jpg</param>
-/// <param name="callback">The action to execute after cropping</param>
-/// <returns>Task</returns>
-Task CropImage(string imagePath, string croppedImagePath, Action callback);
+<plugin.imagecrop.android.ImageCropView
+    android:id="@+id/imageCropper"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_centerHorizontal="true" />
 ```
-**Example**
+**Cross Platform**
 ```
-CrossImageCrop.Current.CropImage(
-	PicturePath, 
-	() => { 
-		// Do something with PicturePath 
-	}, 300, 300);
+...
+// After selecting an image on your device you can set the cropper:
+// For more info on how to select an image, have a look at the included test project
+CrossImageCrop.Current.ImageCropView.SetImage(imagePath, width, height, isRound);
+...
+
+// When you have set the cropper, you can crop and save the image:
+CrossImageCrop.Current.ImageCropView.CropAndSave(imagePath);
+...
 ```
+
 
 #### Credits
 * [cropimage-xamarin by markuspalme](https://github.com/markuspalme/cropimage-xamarin)
