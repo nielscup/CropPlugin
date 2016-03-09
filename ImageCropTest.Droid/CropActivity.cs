@@ -134,7 +134,7 @@ namespace ImageCropTest.Droid
                 return;
 
             _isRound = isRound;
-            _imageCropView.SetImage(_imagePath, width, height, isRound);
+            CrossImageCrop.Current.ImageCropView.SetImage(_imagePath, width, height, isRound);
 
             _buttonLayout.Visibility = ViewStates.Visible;
         }
@@ -143,7 +143,7 @@ namespace ImageCropTest.Droid
         {
             var croppedImagePath = _imagePath.Replace(".", "-cropped.");
 
-            _imageCropView.CropAndSave(croppedImagePath);
+            CrossImageCrop.Current.ImageCropView.CropAndSave(croppedImagePath);
 
             // Set ImageUri to null, otherwise it will not update if set to the same URI, and prevent out of memory exceptions
             _croppedImage.SetImageURI(null);            
