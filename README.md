@@ -19,16 +19,13 @@ Call **CrossShare.Current** from any project or PCL to gain access to APIs.
 
 **iOS**
 ```
-UIView _imageCropView;
-
 public override void ViewDidLoad()
 {
 	base.ViewDidLoad();
     	
 	// Add the imageCropView control to your view:
-	_imageCropView = (UIView)CrossImageCrop.Current.ImageCropView;
-	_imageCropView.Frame = View.Frame;
-	Add(_imageCropView);
+	((UIView)CrossImageCrop.Current.ImageCropView).Frame = View.Frame;
+	Add((UIView)CrossImageCrop.Current.ImageCropView);
 }
 ```
 
