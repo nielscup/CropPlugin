@@ -34,7 +34,7 @@ public override void ViewDidLoad()
 
 **Android**
 ```
-<plugin.imagecrop.android.ImageCropView
+<Plugin.ImageCrop.ImageCropView
     android:id="@+id/imageCropper"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -52,7 +52,19 @@ CrossImageCrop.Current.ImageCropView.SetImage(imagePath, width, height, isRound)
 CrossImageCrop.Current.ImageCropView.CropAndSave(imagePath);
 ...
 ```
-
+**MvvmCross**
+```
+// Add this code to your MvxAndroidSetup so MvvmCross can bind to the ImageCropView
+protected override System.Collections.Generic.IList<System.Reflection.Assembly> AndroidViewAssemblies 
+{
+    get 
+    {
+	    var assemblies = base.AndroidViewAssemblies;
+	    assemblies.Add(typeof(Plugin.ImageCrop.ImageCropView).Assembly);
+	    return assemblies;
+    }
+}
+```
 
 #### Credits
 * [cropimage-xamarin by markuspalme](https://github.com/markuspalme/cropimage-xamarin)

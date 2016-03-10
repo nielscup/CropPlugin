@@ -24,6 +24,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D0A86022-E6C2-4A55-9CF8-38C0929101E0}"
 	ProjectSection(SolutionItems) = preProject
 		Plugin.ImageCrop.nuspec = Plugin.ImageCrop.nuspec
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageCropTest.Droid", "ImageCropTest.Droid\ImageCropTest.Droid.csproj", "{EC61A3E3-7C88-457C-9C11-AA336EC495FA}"
@@ -367,6 +368,7 @@ Global
 		{50953F40-7D50-43E6-AEC0-89D7C2A198F9}.AppStore|x64.ActiveCfg = AppStore|iPhone
 		{50953F40-7D50-43E6-AEC0-89D7C2A198F9}.AppStore|x86.ActiveCfg = AppStore|iPhone
 		{50953F40-7D50-43E6-AEC0-89D7C2A198F9}.Debug|Any CPU.ActiveCfg = Debug|iPhone
+		{50953F40-7D50-43E6-AEC0-89D7C2A198F9}.Debug|Any CPU.Build.0 = Debug|iPhone
 		{50953F40-7D50-43E6-AEC0-89D7C2A198F9}.Debug|ARM.ActiveCfg = Debug|iPhone
 		{50953F40-7D50-43E6-AEC0-89D7C2A198F9}.Debug|iPhone.ActiveCfg = Debug|iPhone
 		{50953F40-7D50-43E6-AEC0-89D7C2A198F9}.Debug|iPhone.Build.0 = Debug|iPhone

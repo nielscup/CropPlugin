@@ -31,7 +31,7 @@ namespace Plugin.ImageCrop
     /// <summary>
     /// The image crop view
     /// </summary>
-    [Register("plugin.imagecrop.android.ImageCropView")]
+    [Register("Plugin.ImageCrop.ImageCropView")]
     public class ImageCropView : ImageViewTouchBase, IImageCropView
     {
         List<HighlightView> hightlightViews = new List<HighlightView>();

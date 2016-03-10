@@ -24,12 +24,12 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <plugin.imagecrop.android.ImageCropView
+        <Plugin.ImageCrop.ImageCropView
             android:id="@+id/imageCropper"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_centerHorizontal="true" />
-        <plugin.customcamera.android.CustomCameraView
+        <Plugin.CustomCamera.CustomCameraView
             android:id="@+id/customCamera"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
