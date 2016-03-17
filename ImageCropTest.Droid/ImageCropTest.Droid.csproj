@@ -51,12 +51,12 @@
       <HintPath>..\packages\Plugin.CustomCamera.0.0.17\lib\MonoAndroid10\Plugin.CustomCamera.Abstractions.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Plugin.Share, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Plugin.Share.3.2.1.3\lib\MonoAndroid10\Plugin.Share.dll</HintPath>
+    <Reference Include="Plugin.ShareFile, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Plugin.ShareFile.0.0.1\lib\MonoAndroid10\Plugin.ShareFile.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Plugin.Share.Abstractions, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Plugin.Share.3.2.1.3\lib\MonoAndroid10\Plugin.Share.Abstractions.dll</HintPath>
+    <Reference Include="Plugin.ShareFile.Abstractions, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Plugin.ShareFile.0.0.1\lib\MonoAndroid10\Plugin.ShareFile.Abstractions.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />

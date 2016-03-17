@@ -46,7 +46,7 @@
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
     <CodesignKey>iPhone Developer: Niels Cup (93A7434JZ3)</CodesignKey>
     <MtouchDebug>true</MtouchDebug>
-    <CodesignProvision>677c752d-0a67-4492-96bb-9b79a7941a02</CodesignProvision>
+    <CodesignProvision>365f83cd-f482-4f81-af32-1519ffefb5b5</CodesignProvision>
     <CodesignResourceRules />
     <CodesignExtraArgs />
   </PropertyGroup>
@@ -112,12 +112,12 @@
       <HintPath>..\..\packages\Plugin.CustomCamera.0.0.17\lib\Xamarin.iOS10\Plugin.CustomCamera.Abstractions.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Plugin.Share, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Plugin.Share.3.2.1.3\lib\Xamarin.iOS10\Plugin.Share.dll</HintPath>
+    <Reference Include="Plugin.ShareFile, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Plugin.ShareFile.0.0.1\lib\Xamarin.iOS10\Plugin.ShareFile.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Plugin.Share.Abstractions, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Plugin.Share.3.2.1.3\lib\Xamarin.iOS10\Plugin.Share.Abstractions.dll</HintPath>
+    <Reference Include="Plugin.ShareFile.Abstractions, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Plugin.ShareFile.0.0.1\lib\Xamarin.iOS10\Plugin.ShareFile.Abstractions.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />

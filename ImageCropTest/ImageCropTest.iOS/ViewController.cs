@@ -7,7 +7,7 @@ using Plugin.CustomCamera;
 using Plugin.CustomCamera.Abstractions;
 using Plugin.ImageCrop;
 using Plugin.ImageCrop.Abstractions;
-using Plugin.Share;
+using Plugin.ShareFile;
 using System;
 using UIKit;
 
@@ -20,15 +20,16 @@ namespace ImageCropTest.iOS
         int xPos;
         const int defaultSize = 300;
         string _imagePath;
-        string croppedImagePath;
-        UIButton authenticateButton;
+        //string _croppedImagePath;
+        UIButton _authenticateButton;
         bool _isRound;
 
         UIButton cropButton300x300;
         UIButton cropButton300x200;
         UIButton anyCropButton;
         UIButton roundCropButton;
-        UIButton saveImageButton;        
+        UIButton saveImageButton;
+        UIButton shareImageButton;  
 
         public ViewController(IntPtr handle) : base(handle) { }
 
@@ -55,13 +56,19 @@ namespace ImageCropTest.iOS
             CrossCustomCamera.Current.CustomCameraView.Start(CameraSelection.Front);
             
             yPos = (int)UIScreen.MainScreen.Bounds.Height - 75;
-            var buttonWidth = (int)UIScreen.MainScreen.Bounds.Width / 2;
+            var buttonWidth = (int)UIScreen.MainScreen.Bounds.Width / 3;
 
             var takePictureButton = AddButton("Take Picture", buttonWidth);
             takePictureButton.TouchUpInside += takePictureButton_TouchUpInside;
 
             var selectPictureButton = AddButton("Select Picture", buttonWidth, true);
             selectPictureButton.TouchUpInside += selectPictureButton_TouchUpInside;
+
+            shareImageButton = AddButton("Share", 56, true);
+            shareImageButton.TouchUpInside += (s, e) =>
+            {
+                CrossShareFile.Current.ShareLocalFile(_imagePath);
+            };
 
             buttonWidth = (int)UIScreen.MainScreen.Bounds.Width / 4;
             cropButton300x300 = AddButton("300x300", buttonWidth);
@@ -81,7 +88,7 @@ namespace ImageCropTest.iOS
             {
                 CrossImageCrop.Current.ImageCropView.CropAndSave(_imagePath);
                 SetPicture(_imagePath);
-            };
+            };            
 
             ShowButtons(false);
         }
@@ -93,6 +100,7 @@ namespace ImageCropTest.iOS
             anyCropButton.Hidden = !isVisible;
             roundCropButton.Hidden = !isVisible;
             saveImageButton.Hidden = !isVisible;
+            shareImageButton.Hidden = !isVisible;
         }
 
         void takePictureButton_TouchUpInside(object sender, EventArgs e)
@@ -129,7 +137,7 @@ namespace ImageCropTest.iOS
             var picture = obj.ValueForKey(new NSString("UIImagePickerControllerOriginalImage")) as UIImage;
             var documentsDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
             _imagePath = System.IO.Path.Combine(documentsDirectory, "picture.jpg"); // hardcoded filename, overwritten each time
-            croppedImagePath = System.IO.Path.Combine(documentsDirectory, "picture-cropped.jpg");
+            //_croppedImagePath = System.IO.Path.Combine(documentsDirectory, "picture-cropped.jpg");
             NSData imgData = picture.AsJPEG();
             NSError err = null;
             if (imgData.Save(_imagePath, false, out err))
@@ -139,7 +147,7 @@ namespace ImageCropTest.iOS
             }
             else
             {
-                Console.WriteLine("NOT saved as " + croppedImagePath + " because" + err.LocalizedDescription);
+                Console.WriteLine("NOT saved as " + _imagePath + " because" + err.LocalizedDescription);
             }
         }
 
@@ -195,8 +203,8 @@ namespace ImageCropTest.iOS
         void SetAuthentication()
         {
             yPos = 220;
-            authenticateButton = AddButton("Authenticate");
-            authenticateButton.TouchUpInside += (s, e) => AuthenticateMe();
+            _authenticateButton = AddButton("Authenticate");
+            _authenticateButton.TouchUpInside += (s, e) => AuthenticateMe();
         }
 
         /// <summary>
@@ -217,7 +225,7 @@ namespace ImageCropTest.iOS
                         if (success)
                         {
                             Console.WriteLine("You logged in!");
-                            authenticateButton.Hidden = true;
+                            _authenticateButton.Hidden = true;
                             Initialize();
                         }
                         else

@@ -13,6 +13,7 @@ using Android.Provider;
 using Plugin.CustomCamera;
 using Plugin.CustomCamera.Abstractions;
 using Android.Graphics.Drawables;
+using Plugin.ShareFile;
 
 namespace ImageCropTest.Droid
 {
@@ -25,7 +26,9 @@ namespace ImageCropTest.Droid
         LinearLayout _buttonLayout;
         Button _buttonTakePicture;
         Button _buttonSave;
+        Button _buttonShare;
         bool _isRound;
+        string croppedImagePath;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -51,7 +54,7 @@ namespace ImageCropTest.Droid
             _buttonTakePicture.Click += buttonTakePicture_Click;
 
             var button300x300 = FindViewById<Button>(Resource.Id.button300x300);
-            button300x300.Click += (s, e) => SetCropper(300, 300);
+            button300x300.Click += (s, e) => SetCropper2(300, 300);
                         
             var button300x200 = FindViewById<Button>(Resource.Id.button300x200);
             button300x200.Click += (s, e) => SetCropper(300, 200);
@@ -65,14 +68,19 @@ namespace ImageCropTest.Droid
             _buttonSave = FindViewById<Button>(Resource.Id.buttonSave);
             _buttonSave.Click += (s, e) => CropAndSaveImage();
             _buttonSave.Visibility = ViewStates.Gone;
-        }
 
+            _buttonShare = FindViewById<Button>(Resource.Id.buttonShare);
+            _buttonShare.Click += (s, e) => ShareImage();
+            _buttonShare.Visibility = ViewStates.Gone;
+        }
+                
         void buttonTakePicture_Click(object sender, EventArgs e)
         {
             if (_croppedImage.Visibility == ViewStates.Visible || _croppedImageRound.Visibility == ViewStates.Visible || ((View)CrossImageCrop.Current.ImageCropView).Visibility == ViewStates.Visible)
             {
                 _croppedImage.SetImageBitmap(null);
                 _croppedImage.Visibility = ViewStates.Gone;
+                _buttonShare.Visibility = ViewStates.Gone;
 
                 _croppedImageRound.Visibility = ViewStates.Gone;
                 ((View)CrossImageCrop.Current.ImageCropView).Visibility = ViewStates.Gone;
@@ -117,18 +125,32 @@ namespace ImageCropTest.Droid
             _buttonLayout.Visibility = ViewStates.Visible;
         }
 
+        private void SetCropper2(int width = 0, int height = 0)
+        {
+            if (string.IsNullOrEmpty(_imagePath))
+                return;
+
+            CrossImageCrop.Current.ImageCropView.OutputWidth = width;
+            CrossImageCrop.Current.ImageCropView.OutputHeight = height;
+
+            _buttonLayout.Visibility = ViewStates.Visible;
+        }
+
         private void CropAndSaveImage()
         {
-            var croppedImagePath = _imagePath.Replace(".", "-cropped.");
+            croppedImagePath = _imagePath.Replace(".", "-cropped.");
 
             CrossImageCrop.Current.ImageCropView.CropAndSave(croppedImagePath);
-
+            
             // Set ImageUri to null, otherwise it will not update if set to the same URI, and prevent out of memory exceptions
             _croppedImage.SetImageURI(null);            
             _croppedImage.Visibility = ViewStates.Gone;
 
             _croppedImageRound.SetImageURI(null);
             _croppedImageRound.Visibility = ViewStates.Gone;
+
+            _buttonSave.Visibility = ViewStates.Gone;
+            _buttonShare.Visibility = ViewStates.Visible;
 
             _buttonLayout.Visibility = ViewStates.Gone;
             ((View)CrossImageCrop.Current.ImageCropView).Visibility = ViewStates.Gone;
@@ -154,6 +176,11 @@ namespace ImageCropTest.Droid
             }
 
             return dir;
+        }
+
+        private void ShareImage()
+        {
+            CrossShareFile.Current.ShareLocalFile(croppedImagePath);
         }
     }
 }

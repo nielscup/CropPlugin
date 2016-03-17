@@ -12,14 +12,17 @@
             android:id="@+id/buttonTakePicture"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
             android:text="Take Picture" />
         <Button
             android:id="@+id/buttonSave"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Save"
-            android:layout_gravity="center_horizontal" />
+            android:text="Save" />
+        <Button
+            android:id="@+id/buttonShare"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Share" />
     </LinearLayout>
     <FrameLayout
         android:layout_width="match_parent"
