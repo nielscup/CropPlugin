@@ -2,9 +2,7 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{2882AEEB-D4CD-4EB9-8A6C-6653B33681F0}</ProjectGuid>
     <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
@@ -47,23 +45,21 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Plugin.ImageCrop.Abstractions\Plugin.ImageCrop.Abstractions.csproj">
-      <Project>{6edb0588-ffc5-4ef5-8a99-9e241d0f878d}</Project>
+      <Project>{6EDB0588-FFC5-4EF5-8A99-9E241D0F878D}</Project>
       <Name>Plugin.ImageCrop.Abstractions</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Plugin.CustomCamera, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Plugin.CustomCamera.0.0.13\lib\Xamarin.iOS10\Plugin.CustomCamera.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Plugin.CustomCamera.Abstractions, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Plugin.CustomCamera.0.0.13\lib\Xamarin.iOS10\Plugin.CustomCamera.Abstractions.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="Xamarin.iOS" />
+    <Reference Include="Plugin.CustomCamera, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\packages\Plugin.CustomCamera.0.0.13\lib\Xamarin.iOS10\Plugin.CustomCamera.dll</HintPath>
+    </Reference>
+    <Reference Include="Plugin.CustomCamera.Abstractions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\packages\Plugin.CustomCamera.0.0.13\lib\Xamarin.iOS10\Plugin.CustomCamera.Abstractions.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
