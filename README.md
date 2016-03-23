@@ -15,7 +15,7 @@ nuget pack Plugin.ImageCrop.nuspec
 
 ### API Usage
 
-Call **CrossShare.Current** from any project or PCL to gain access to APIs.
+Call **CrossImageCrop.Current** from any project or PCL to gain access to APIs.
 
 **iOS**
 ```
